@@ -1,5 +1,5 @@
 """
-Django settings for tango_with_django_project project.
+Django settings for mysite project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'wblwvem1y6lh9880%8o)$$37m@p&j7km^w2#9b0jhd4oej&)^p'
+SECRET_KEY = 'ec$tis^sy37y+0_@3v!5nxz+szz(hq#5_@edqrbu*6szfn0o(5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,9 +48,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'tango_with_django_project.urls'
+ROOT_URLCONF = 'mysite.urls'
 
-WSGI_APPLICATION = 'tango_with_django_project.wsgi.application'
+WSGI_APPLICATION = 'mysite.wsgi.application'
 
 
 # Database
