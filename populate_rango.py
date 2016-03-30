@@ -16,11 +16,10 @@ def populate():
 
 
 def add_manager():
-    u = User.objects.create(username="manager", password="password")
+    u = User.objects.create(username="manager", is_staff= True)
+    u.set_password("password")
     u.save()
-    m = UserProfile.objects.create(user=u,admin=True)
 
-    m.save()
 
 
 if __name__ == '__main__':

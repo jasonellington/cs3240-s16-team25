@@ -24,6 +24,9 @@ def user_login(request):
 
         if user:
             if user.is_active:
+                if (user.is_staff):
+                    login(request,user)
+                    return HttpResponseRedirect('/myapplication/manager/')
                 login(request, user)
                 return HttpResponseRedirect('/myapplication/')
             else:
