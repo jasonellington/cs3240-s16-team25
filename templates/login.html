@@ -11,9 +11,9 @@
         <form id="login_form" method="post" action="/myapplication/login/">
             <h1>Login: </h1>
             {% csrf_token %}
-            <label for="username">Username:</label><input class="form-control" type="text" name="username" value="" size="50" />
+            <label for="id_username">Username:</label><input id="id_username" class="form-control" type="text" name="username" value="" size="50" />
             <br />
-            <label for="username">Password:</label><input class="form-control" type="password" name="password" value="" size="50" />
+            <label for="id_password">Password:</label><input id="id_password" class="form-control" type="password" name="password" value="" size="50" />
             <br />
 
             <input class="btn btn-default" type="submit" value="submit" />
