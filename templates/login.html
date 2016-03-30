@@ -2,24 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login</title>
+        {% load staticfiles %}
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{%  static "styles.css" %}">
 </head>
 <body>
-<h1>Login: </h1>
-    <form id="user_form" method="post" action="/myapplication/login/">
-
+        <form id="login_form" method="post" action="/myapplication/login/">
+            <h1>Login: </h1>
             {% csrf_token %}
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
+            <label for="username">Username:</label><input class="form-control" type="text" name="username" value="" size="50" />
+            <br />
+            <label for="username">Password:</label><input class="form-control" type="password" name="password" value="" size="50" />
+            <br />
 
-            {% for field in form.visible_fields %}
-                {{ field.errors }}
-                {{ field.help_text }}
-                {{ field }}
-            {% endfor %}
-
-            <input type="submit" name="submit" value="Login" />
+            <input class="btn btn-default" type="submit" value="submit" />
         </form>
 </body>
 </html>

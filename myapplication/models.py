@@ -1,9 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 # Create your models here.
-class User(models.Model):
-    username = models.CharField(max_length=20, unique=True)
-    password = models.CharField(max_length=32, unique=False)
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
     admin = models.BooleanField(default=False)
+
     def __str__(self):
-        return self.username
+        return self.user.username
