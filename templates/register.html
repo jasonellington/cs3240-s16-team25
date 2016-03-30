@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "styles.css" %}">
 </head>
 <body>
-        {% if registered %}
-        Rango says: <strong>thank you for registering!</strong>
-        <a href="/myapplication/">Return to the homepage.</a><br />
-        {% else %}
-        <strong>register here!</strong><br />
+{% if registered %}
+    <strong>Thank you for registering!</strong>
+    <a href="/myapplication/">Return to the homepage.</a><br/>
+{% else %}
+    <form id="user_form" method="post" action="/myapplication/register/"
+          enctype="multipart/form-data">
+        <h1>Register:</h1>
+        {% csrf_token %}
 
-        <form id="user_form" method="post" action="/myapplication/register/"
-                enctype="multipart/form-data">
-
-            {% csrf_token %}
-
-            {{ user_form.as_p }}
-
-            <!-- Provide a button to click to submit the form. -->
-            <input type="submit" name="submit" value="Register" />
-        </form>
-        {% endif %}
+        <label for="id_username">Username:</label>
+        <input class="form-control" id="id_username" maxlength="30" name="username" type="text"/>
+        <br>
+        <label for="id_email">Email address:</label>
+        <input class="form-control" id="id_email" maxlength="75" name="email" type="email"/>
+        <br>
+        <label for="id_password">Password:</label>
+        <input class="form-control" id="id_password" name="password" type="password"/>
+        <br>
+        <!-- Provide a button to click to submit the form. -->
+        <input class="btn btn-default" type="submit" name="submit" value="Register"/>
+    </form>
+{% endif %}
 </body>
 </html>

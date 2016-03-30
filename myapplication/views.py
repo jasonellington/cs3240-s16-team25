@@ -6,6 +6,7 @@ from django.template import RequestContext
 
 from myapplication.forms import UserForm
 
+
 # Create your views here.
 
 def index(request):
@@ -37,7 +38,6 @@ def user_login(request):
 
 
 def register(request):
-
     context = RequestContext(request)
 
     registered = False
@@ -56,7 +56,8 @@ def register(request):
         user_form = UserForm()
 
     return render_to_response('register.html', {'user_form': user_form, 'registered': registered},
-            context)
+                              context)
+
 
 @login_required
 def user_logout(request):
