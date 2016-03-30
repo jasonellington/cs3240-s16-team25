@@ -70,4 +70,9 @@ def user_logout(request):
 def manager(request):
     print("hello word")
 
-    return HttpResponse("this is the manager page")
+    if request.user.is_staff:
+        return HttpResponse("this is the manager page")
+
+    else:
+        #Deploy SWAT if a non-admin tries to access the page
+        return HttpResponse("A SWAT team is on the way")
