@@ -62,3 +62,8 @@ def register(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/myapplication/')
+
+def manager(request):
+    print("hello word")
+
+    return HttpResponse("this is the manager page")
