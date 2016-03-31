@@ -11,9 +11,9 @@ from myapplication.models import UserProfile
 
 def populate():
 
-    if len(list(UserProfile.objects.filter(user__username="manager").all())) == 0:
+    if len(list(User.objects.filter(username = "manager").all())) == 0:
         add_manager()
-
+    pass
 
 def add_manager():
     u = User.objects.create(username="manager", is_staff= True)
