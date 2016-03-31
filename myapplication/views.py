@@ -71,7 +71,7 @@ def manager(request):
     print("hello word")
 
     if request.user.is_staff:
-        return HttpResponse("this is the manager page")
+        return render(request, 'manager.html')
 
     else:
         #Deploy SWAT if a non-admin tries to access the page
