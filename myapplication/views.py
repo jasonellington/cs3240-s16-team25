@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.auth.models import User
 
 from myapplication.forms import UserForm
 
@@ -71,7 +72,7 @@ def manager(request):
     print("hello word")
 
     if request.user.is_staff:
-        return HttpResponse("this is the manager page")
+        return HttpResponse(User.objects.all())
 
     else:
         #Deploy SWAT if a non-admin tries to access the page
