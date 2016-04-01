@@ -14,8 +14,11 @@
         {% if user.is_authenticated %}
             <h1>This is the manager page! {{ user.username }}!</h1>
             <a href="/myapplication/logout/">Logout</a>
-
-        {% endif %}
+            {%  if users %}
+                <table>
+                <tr><td>Username</td><td>Is Admin</td></tr>
+                </table>
+            {% endif %}
     </div>
 </div>
 </body>
