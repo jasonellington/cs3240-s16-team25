@@ -72,7 +72,9 @@ def manager(request):
     print("hello word")
 
     if request.user.is_staff:
-        return HttpResponse(User.objects.all())
+        user_list = User.objects.all()
+        context_dict = {'users': user_list}
+        return render(request, 'manager.html', context_dict)
 
     else:
         #Deploy SWAT if a non-admin tries to access the page

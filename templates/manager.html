@@ -15,10 +15,14 @@
             <h1>This is the manager page! {{ user.username }}!</h1>
             <a href="/myapplication/logout/">Logout</a>
             {%  if users %}
-                <table>
+                <table border="1|0">
                 <tr><td>Username</td><td>Is Admin</td></tr>
+                {% for user in users %}
+                    <tr><td>{{user.username}}</td><td>{{user.is_staff}}</td></tr>
+                {% endfor %}
                 </table>
             {% endif %}
+    {% endif %}
     </div>
 </div>
 </body>
