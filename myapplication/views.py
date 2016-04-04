@@ -69,11 +69,19 @@ def user_logout(request):
     return HttpResponseRedirect('/myapplication/')
 
 def manager(request):
-    print("hello word")
-
     if request.user.is_staff:
         user_list = User.objects.all()
         context_dict = {'users': user_list}
+
+        if request.method == 'POST':
+            if request.POST.get('delete-btn'):
+                username  = request.POST.get('username')
+                try:
+                    user = User.objects.get(username=username)
+                    user.delete()
+                except User.DoesNotExist:
+                    pass
+
         return render(request, 'manager.html', context_dict)
 
     else:
