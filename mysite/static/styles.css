@@ -1,0 +1,18 @@
+.content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#login_form {
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+#user_form {
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+body {
+    background-color: rgba(0,0,0,0.1);
+}
