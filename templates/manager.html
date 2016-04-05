@@ -51,6 +51,13 @@
                                     <button name="delete-btn" value="Click" type="submit" class="btn btn-danger delete-btn">Delete User</button>
                                     </form>
                                 </td>
+                                <td>
+                                    <form class="create-group" action="#" method="post">
+                                        {% csrf_token %}
+                                        <input hidden type="text" name="username" value="{{ user.username }}">
+                                    <button name="create-group" value="Click" type="submit" class="btn btn-danger delete-btn">Create Group</button>
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -66,6 +73,13 @@ $('.delete-btn').click(function(e) {
         e.preventDefault();
     }
 });
+$('.create-group').click(function(e) {
+    var confirm2 = confirm("What would you like the name of your group to be?");
+    if (confirm2 == false) {
+        e.preventDefault();
+    }
+});
+
 </script>
 </body>
 </html>
