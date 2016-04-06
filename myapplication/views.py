@@ -4,6 +4,8 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
 
 from myapplication.forms import UserForm
 
@@ -81,6 +83,8 @@ def manager(request):
                     user.delete()
                 except User.DoesNotExist:
                     pass
+            if request.POST.get('create-group'):
+                newgroup = Group.objects.create(name="group")
 
         return render(request, 'manager.html', context_dict)
 
