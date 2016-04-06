@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import User, Group
 
 
-from myapplication.forms import UserForm
+from myapplication.forms import UserForm, GroupForm
 
 
 # Create your views here.
@@ -73,7 +73,7 @@ def user_logout(request):
 def manager(request):
     if request.user.is_staff:
         user_list = User.objects.all()
-        context_dict = {'users': user_list}
+        group_list = Group.objects.all()
 
         if request.method == 'POST':
             if request.POST.get('delete-btn'):
@@ -83,10 +83,18 @@ def manager(request):
                     user.delete()
                 except User.DoesNotExist:
                     pass
-            if request.POST.get('create-group'):
-                newgroup = Group.objects.create(name="group")
+            else:
+                group_form = GroupForm(data=request.POST)
+                if group_form.is_valid():
+                    group = group_form.save()
+                    group.save()
+        else:
+            group_form = GroupForm()
+
+        context_dict = {'users': user_list, 'group_form': group_form, 'groups': group_list}
 
         return render(request, 'manager.html', context_dict)
+
 
     else:
         #Deploy SWAT if a non-admin tries to access the page
