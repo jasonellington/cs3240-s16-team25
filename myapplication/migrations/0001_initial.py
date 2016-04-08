@@ -11,11 +11,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name='Message',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
-                ('username', models.CharField(max_length=20, unique=True)),
-                ('password', models.CharField(max_length=32)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('recipient', models.CharField(max_length=30)),
+                ('sender', models.CharField(max_length=30)),
+                ('message', models.TextField()),
+                ('opened', models.BooleanField(default=False)),
             ],
             options={
             },
