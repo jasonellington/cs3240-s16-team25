@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "styles.css" %}">
+</head>
+<body>
+{% if user.is_authenticated %}
+    <div class="container">
+        <form id="send_message" method="post" action="/myapplication/messaging/"
+              enctype="multipart/form-data">
+            <h1>Messaging:</h1>
+            {% csrf_token %}
+
+            <label for="recipient">Recipient:</label>
+            <input class="form-control" id="recipient" maxlength="30" name="recipient" type="text"/>
+            <br>
+
+            <label for="message">Message:</label>
+            <textarea class="form-control" id="message" rows="3" ></textarea>
+            <br>
+
+            <!-- Provide a button to click to submit the form. -->
+            <input class="btn btn-default" type="submit" name="submit" value="Send Message"/>
+    </form>
+    </div>
+
+    <div class="container">
+    "This is a container"
+        <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Sender</th>
+                            <th>Opened</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in Messages %}
+                            <tr>
+                                <td>{{message.sender}}</td>
+                                <td>{{message.opened}}</td>
+                        {% endfor %}
+                    </tbody>
+
+
+        </table>
+
+    </div>
+
+{% else %}
+    <h1>You are not logged in</h1>
+            <a href="/myapplication/register/">Register Here</a><br>
+            <a href="/myapplication/login/">Login</a>
+{% endif %}
+
+
+</body>
+</html>

@@ -6,7 +6,6 @@ import django
 django.setup()
 
 from django.contrib.auth.models import User
-from myapplication.models import UserProfile
 
 
 def populate():

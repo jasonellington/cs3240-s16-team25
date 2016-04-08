@@ -4,8 +4,9 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.models import User
+from myapplication.models import Message
 
-from myapplication.forms import UserForm
+from myapplication.forms import UserForm, SendMessage
 
 
 # Create your views here.
@@ -87,3 +88,26 @@ def manager(request):
     else:
         #Deploy SWAT if a non-admin tries to access the page
         return HttpResponse("A SWAT team is on the way")
+
+def messaging(request):
+
+    try:
+        Messages = Message.objects.get(recipient=request.user.username)
+    except:
+        Messages = {}
+    context_dict = {'messages' : Messages}
+
+    if request.method == 'POST':
+        send_message = SendMessage(data=request.POST)
+
+
+        if send_message.is_valid():
+            send_message.sender = request.user.username
+
+            send_message.save(commit=True)
+
+        else:
+            print(send_message.errors)
+
+
+    return render(request, 'messaging.html', context_dict)
