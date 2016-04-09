@@ -112,16 +112,15 @@ def messaging(request):
     context_dict = {'messages' : Messages}
 
     if request.method == 'POST':
-        send_message = SendMessage(data=request.POST)
+        form = SendMessage(data=request.POST)
 
-
-        if send_message.is_valid():
+        if form.is_valid():
+            send_message = form.save(commit=False)
             send_message.sender = request.user.username
-
-            send_message.save(commit=True)
+            send_message.save()
 
         else:
-            print(send_message.errors)
+            print(form.errors)
 
 
     return render(request, 'messaging.html', context_dict)

@@ -1,4 +1,3 @@
-import json
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -11,3 +10,6 @@ class Message(models.Model):
     sender = models.CharField(max_length=30)
     message = models.TextField()
     opened = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.recipient
