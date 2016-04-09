@@ -73,6 +73,7 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/myapplication/')
 
+
 def manager(request):
     if request.user.is_staff:
         user_list = User.objects.all()
@@ -105,6 +106,7 @@ def manager(request):
     else:
         #Deploy SWAT if a non-admin tries to access the page
         return HttpResponse("A SWAT team is on the way")
+
 
 def messaging(request):
 
