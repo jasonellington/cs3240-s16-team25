@@ -40,12 +40,20 @@
                         <td>{{ user.username }}</td>
                         <td>{{ user.is_staff }}</td>
                         <td>
-                            <form class="delete-form" action="#" method="post">
+                            <form class="suspend-form" action="#" method="post">
                                 {% csrf_token %}
                                 <input hidden type="text" name="username" value="{{ user.username }}">
-                                <button name="delete-btn" value="Click" type="submit" class="btn btn-danger delete-btn">
-                                    Delete User
+                                {% if user.is_active %}
+                                <button name="suspend-btn" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                    Suspend User
                                 </button>
+                                {% else %}
+                                <button name="suspend-btn" value="Click" type="submit"
+                                        class="btn btn-success delete-btn">
+                                    Restore User
+                                </button>
+                                {% endif %}
                             </form>
                         </td>
                     </tr>
@@ -80,15 +88,16 @@
         <input class="form-control" id="id_name" maxlength="30" name="name" type="text"/>
         <br>
         <input class="btn btn-default" type="submit" name="submit" value="Submit"/>
+        </form>
     {% endif %}
 </div>
 <script type="text/javascript">
-    $('.delete-btn').click(function (e) {
-        var confirm2 = confirm("Are you sure you want to delete this user?");
-        if (confirm2 == false) {
-            e.preventDefault();
-        }
-    });
+{#    $('.delete-btn').click(function (e) {#}
+{#        var confirm2 = confirm("Are you sure you want to delete this user?");#}
+{#        if (confirm2 == false) {#}
+{#            e.preventDefault();#}
+{#        }#}
+{#    });#}
 </script>
 </body>
 </html>

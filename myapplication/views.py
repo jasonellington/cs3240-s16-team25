@@ -77,13 +77,18 @@ def manager(request):
     if request.user.is_staff:
         user_list = User.objects.all()
         group_list = Group.objects.all()
+        group_form = GroupForm()
 
         if request.method == 'POST':
-            if request.POST.get('delete-btn'):
+            if request.POST.get('suspend-btn'):
                 username  = request.POST.get('username')
                 try:
                     user = User.objects.get(username=username)
-                    user.delete()
+                    if user.is_active:
+                        user.is_active = False
+                    else:
+                        user.is_active = True
+                    user.save()
                 except User.DoesNotExist:
                     pass
             else:
@@ -91,8 +96,6 @@ def manager(request):
                 if group_form.is_valid():
                     group = group_form.save()
                     group.save()
-        else:
-            group_form = GroupForm()
 
         context_dict = {'users': user_list, 'group_form': group_form, 'groups': group_list}
 
