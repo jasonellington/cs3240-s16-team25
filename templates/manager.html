@@ -57,7 +57,30 @@
                                         Restore User
                                     </button>
                                 {% endif %}
-                            </form></td><td>
+                            </form><br>
+                            <form class="manager-form" action="/myapplication/makemanager/" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    {% if create_manager %}
+                                        {% if user.is_staff %}
+                                            <input hidden type="text" name="username" value="{{ user.username }}">
+                                            <button name="manager-btn" value="Click" class="manager-btn btn btn-danger" type="submit">Remove SM</button>
+                                        {% else %}
+                                            <input hidden type="text" name="username" value="{{ user.username }}">
+                                            <button name="manager-btn" value="Click" class="manager-btn btn btn-success" type="submit">Make SM</button>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if user.is_staff %}
+                                            <input hidden type="text" name="username" value="{{ user.username }}">
+                                            <button name="manager-btn" value="Click" class="manager-btn btn btn-danger" type="submit">Remove SM</button>
+                                        {% else %}
+                                            <button disabled name="manager-btn" value="Click" class="manager-btn btn btn-succcess" type="submit">Too Many SM's</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div><!-- /input-group -->
+                            </form>
+                        </td>
+                        <td>
                             <form class="group-form" action="/myapplication/usergroup/" method="post">
                                 {% csrf_token %}
                                 <div class="input-group">

@@ -74,6 +74,13 @@ def manager(request):
         user_list = User.objects.all()
         group_list = Group.objects.all()
         group_form = GroupForm()
+        create_manager = True
+
+        manager_list = User.objects.filter(is_staff=True)
+        num_managers = len(manager_list)
+        if num_managers > 2:
+            create_manager = False
+
 
         if request.method == 'POST':
             if request.POST.get('suspend-btn'):
@@ -94,7 +101,7 @@ def manager(request):
                     group = group_form.save()
                     group.save()
 
-        context_dict = {'users': user_list, 'group_form': group_form, 'groups': group_list}
+        context_dict = {'users': user_list, 'group_form': group_form, 'groups': group_list, 'create_manager': create_manager}
 
         return render(request, 'manager.html', context_dict)
 
@@ -114,6 +121,26 @@ def user_to_group(request):
                     group.save()
                 except Group.DoesNotExist:
                     pass
+    return HttpResponseRedirect('/myapplication/manager')
+
+
+def make_manager(request):
+    if request.method == 'POST':
+        manager_list = User.objects.filter(is_staff=True)
+        num_managers = len(manager_list)
+
+        if request.POST.get('manager-btn'):
+            username  = request.POST.get('username')
+            try:
+               user = User.objects.get(username=username)
+               if user.is_staff:
+                   user.is_staff = False
+               elif num_managers < 3:
+                   user.is_staff = True
+               user.save()
+
+            except User.DoesNotExist:
+                pass
     return HttpResponseRedirect('/myapplication/manager')
 
 
