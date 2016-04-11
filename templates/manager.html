@@ -136,8 +136,8 @@
         $('.user-group-btn').click(function (e) {
             if (groups.indexOf($("#group-name").val()) >= 0) {
             } else {
-                console.log("Group doesn't exist")
                 e.preventDefault();
+                alert("Group was not found");
             }
         });
 </script>
