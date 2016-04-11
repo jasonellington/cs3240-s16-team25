@@ -3,15 +3,22 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from myapplication.models import Message
+from myapplication.models import Message, Report
 from django.contrib.auth.models import User, Group
-from myapplication.forms import UserForm, GroupForm, SendMessage
+from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm
 
 
 # Create your views here.
 
 def index(request):
-    return render(request, 'index.html')
+    report_list=Report.objects.all()
+    report_form=ReportForm(data=request.POST)
+    if report_form.is_valid():
+        report = report_form.save(user=request.user)
+        report.save()
+    context_dict = {'Reports' : report_list, 'report_form' : report_form}
+
+    return render(request, 'index.html', context_dict)
 
 
 def user_login(request):

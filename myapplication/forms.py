@@ -1,5 +1,6 @@
 from django import forms
-from myapplication.models import Message
+from django.forms import ModelForm
+from myapplication.models import Message,Report
 from django.contrib.auth.models import User, Group
 
 
@@ -28,3 +29,19 @@ class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
         fields = ('name',)
+
+class ReportForm(forms.ModelForm):
+    description = forms.CharField(max_length=128,help_text="Enter a short description")
+    content = forms.TextInput()
+    security = forms.BooleanField(required=False, initial=False, label="Private")
+
+    def save(self,user, commit=True):
+        r = ModelForm.save(self,commit=False)
+        r.author = user
+        if commit:
+            r.save()
+        return r
+
+    class Meta:
+        model = Report
+        fields = ('description','content','security')
