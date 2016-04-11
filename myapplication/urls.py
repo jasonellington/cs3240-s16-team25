@@ -7,5 +7,6 @@ urlpatterns = patterns('',
         url(r'^register/$', views.register, name='register'),
         url(r'^logout/$', views.user_logout, name='logout'),
         url(r'^manager/$', views.manager, name='admin'),
-        url(r'^messaging/$', views.messaging, name='messaging')
+        url(r'^messaging/$', views.messaging, name='messaging'),
+        url(r'^usergroup/$', views.user_to_group, name='addtogroup')
                        )

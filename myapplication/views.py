@@ -3,14 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.contrib.auth.models import User
 from myapplication.models import Message
-
-from myapplication.forms import UserForm, SendMessage
 from django.contrib.auth.models import User, Group
-
-
-from myapplication.forms import UserForm, GroupForm
+from myapplication.forms import UserForm, GroupForm, SendMessage
 
 
 # Create your views here.
@@ -92,6 +87,7 @@ def manager(request):
                     user.save()
                 except User.DoesNotExist:
                     pass
+
             else:
                 group_form = GroupForm(data=request.POST)
                 if group_form.is_valid():
@@ -106,6 +102,19 @@ def manager(request):
     else:
         #Deploy SWAT if a non-admin tries to access the page
         return HttpResponse("A SWAT team is on the way")
+
+def user_to_group(request):
+    if request.method == 'POST':
+            if request.POST.get('user-group-btn'):
+                username  = request.POST.get('username')
+                group_name = request.POST.get('group-name')
+                try:
+                    group = Group.objects.get(name=group_name)
+                    group.user_set.add(User.objects.get(username=username))
+                    group.save()
+                except Group.DoesNotExist:
+                    pass
+    return HttpResponseRedirect('/myapplication/manager')
 
 
 def messaging(request):
