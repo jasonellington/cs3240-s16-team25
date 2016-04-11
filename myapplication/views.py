@@ -119,11 +119,11 @@ def user_to_group(request):
 
 def messaging(request):
 
-    try:
-        Messages = Message.objects.get(recipient=request.user.username)
-    except:
-        Messages = {}
+    Messages = Message.objects.filter(recipient=request.user.username)
+    # except:
+    #     Messages = []
     context_dict = {'messages' : Messages}
+    
 
     if request.method == 'POST':
         form = SendMessage(data=request.POST)
