@@ -32,13 +32,13 @@
                 </div>
             </form>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
     </ul>
   </div>
 </nav>
 </div>
-<div class="container">
-    <div class="content">
+<div class="cotainer">
+    <div class="container">
         <h1>Home Page</h1>
         {% if user.is_authenticated %}
             <p>You are logged in as {{ user.username }}!</p>
@@ -111,7 +111,6 @@
         {% else %}
             <h1>You are not logged in</h1>
             <a href="/myapplication/register/">Register Here</a><br>
-            <a href="/myapplication/login/">Login</a>
         {% endif %}
     </div>
 </div>
