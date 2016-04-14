@@ -172,7 +172,7 @@ def messaging(request):
             else:
                 print(form.errors)
         if request.POST.get('delete-message'):
-            print("trying to delete")
+            
 
             id = request.POST.get('id')
 
