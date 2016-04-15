@@ -160,15 +160,27 @@ def messaging(request):
     
 
     if request.method == 'POST':
-        form = SendMessage(data=request.POST)
+        if request.POST.get('submit'):
 
-        if form.is_valid():
-            send_message = form.save(commit=False)
-            send_message.sender = request.user.username
-            send_message.save()
+            form = SendMessage(data=request.POST)
 
-        else:
-            print(form.errors)
+            if form.is_valid():
+                send_message = form.save(commit=False)
+                send_message.sender = request.user.username
+                send_message.save()
+
+            else:
+                print(form.errors)
+        if request.POST.get('delete-message'):
+            
+
+            id = request.POST.get('id')
+
+            try:
+                dump = Message.objects.get(id=id)
+                dump.delete()
+            except:
+                print("delete failed")
 
 
     return render(request, 'messaging.html', context_dict)
