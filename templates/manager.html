@@ -85,7 +85,7 @@
                                 {% csrf_token %}
                                 <div class="input-group">
                                     <input hidden type="text" name="username" value="{{ user.username }}">
-                                    <input id="group-name" type="text" class="form-control" name="group-name" placeholder="Enter Group Name">
+                                    <input type="text" class="form-control group-name" name="group-name" placeholder="Enter Group Name">
                                     <span class="input-group-btn">
                                         <button name="user-group-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
                                     </span>
@@ -133,8 +133,9 @@
         groups.push("{{ group.name }}")
         {% endfor %}
 
-        $('.user-group-btn').click(function (e) {
-            if (groups.indexOf($("#group-name").val()) >= 0) {
+        $('.group-form').submit(function (e) {
+            group = this.elements['group-name'].value;
+            if (groups.indexOf(group) >= 0) {
             } else {
                 e.preventDefault();
                 alert("Group was not found");
