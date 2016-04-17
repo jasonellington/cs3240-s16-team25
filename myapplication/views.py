@@ -6,7 +6,7 @@ from django.template import RequestContext
 from myapplication.models import Message, Report
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm
-
+from datetime import datetime
 
 # Create your views here.
 
@@ -184,3 +184,85 @@ def messaging(request):
 
 
     return render(request, 'messaging.html', context_dict)
+
+
+def reports(request):
+    report_list=Report.objects.all()
+    params = []
+    if request.method == 'POST':
+        items = request.POST
+        for item in items:
+            if "cat" in item:
+                num = item[3:]
+                param = {"cat" : request.POST.get("cat" + str(num)),
+                         "con" : request.POST.get("con" + str(num)),
+                         "val" : request.POST.get("val" + str(num))}
+                params.append(param)
+    new_list = []
+    exclude = []
+    for param in params:
+        con = param["con"]
+        cat = param["cat"]
+        val = param["val"]
+        if val == "":
+            continue
+        if con == 'AND':
+            if cat == "Description":
+                for report in report_list:
+                    if str(report.description) != str(val):
+                        exclude.append(str(report.author) + str(report.date))
+            elif cat == "Created After":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() <= date_object.date():
+                        exclude.append(str(report.author) + str(report.date))
+            elif cat == "Created Before":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() >= date_object.date():
+                        exclude.append(str(report.author) + str(report.date))
+            elif cat == "Created On":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() != date_object.date():
+                        exclude.append(str(report.author) + str(report.date))
+            else:
+                for report in report_list:
+                    if str(report.author) != str(val):
+                        exclude.append(str(report.author) + str(report.date))
+        else:
+            if cat == "Description":
+                for report in report_list:
+                    if str(report.description) == str(val):
+                        if str(report.author) + str(report.date) in exclude:
+                            exclude.remove(str(report.author) + str(report.date))
+            elif cat == "Created After":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() > date_object.date():
+                        if str(report.author) + str(report.date) in exclude:
+                            exclude.remove(str(report.author) + str(report.date))
+            elif cat == "Created Before":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() < date_object.date():
+                        if str(report.author) + str(report.date) in exclude:
+                            exclude.remove(str(report.author) + str(report.date))
+            elif cat == "Created On":
+                date_object = datetime.strptime(val, '%b %d %Y')
+                for report in report_list:
+                    if report.date.date() == date_object.date():
+                        if str(report.author) + str(report.date) in exclude:
+                            exclude.remove(str(report.author) + str(report.date))
+            else:
+                for report in report_list:
+                    if str(report.author) == str(val):
+                        if str(report.author) + str(report.date) in exclude:
+                            exclude.remove(str(report.author) + str(report.date))
+    for report in report_list:
+        if str(report.author) + str(report.date) not in exclude:
+            new_list.append(report)
+
+    context_dict = {"Reports": new_list}
+
+    return render(request, 'reports.html', context_dict)
