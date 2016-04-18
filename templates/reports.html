@@ -37,7 +37,7 @@
         </div>
     </nav>
 </div>
-<div class="cotainer">
+<div class="container">
     <div class="container">
         <h1>Reports</h1>
         {% if user.is_authenticated %}
@@ -82,6 +82,7 @@
                         <th>Date</th>
                         <th>Content</th>
                         <th>Private</th>
+                        <th>Enc</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
@@ -93,6 +94,7 @@
                             <td>{{ report.date }}</td>
                             <td>{{ report.content }}</td>
                             <td>{{ report.security }}</td>
+                            <td>{{ report.encrypted }}</td>
                             <td>{% if report.author.username == user.username %}
                             <form class="edit-form" action="../editreport/" method="post">
                                     {% csrf_token %}
@@ -115,8 +117,11 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <a href="/myapplication/makereport/">Make a New Report</a>
             {% endif %}
+            <br>
+            <a href="/myapplication/makereport/">Make a New Report</a>
+            <br>
+            <br>
         {% else %}
             <h1>You are not logged in</h1>
             <a href="/myapplication/register/">Register Here</a><br>

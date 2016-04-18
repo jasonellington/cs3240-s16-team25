@@ -46,11 +46,11 @@
                 <input class="form-control" id="id_description" maxlength="128" name="description" type="text"/>
                 <label for="id_content">Content:</label>
                 <textarea class="form-control" id="id_content" name="content" rows="12" ></textarea>
-                <label for="id_files">Files:</label> Encyrpted: <input type="checkbox" name="encrypted" value="True">
+                <label for="id_files">Files:</label> Encyrpted: <input type="checkbox" name="encrypted" value="True"/>
                 <input type="file" name="files" multiple/>
-                <label for="id_security">Security:</label>
-                Public <input type="radio" id="id_security" name="security" value="False" checked>
-                Private <input type="radio" id="id_security" name="security" value="True">
+                <label for="id_security">Security:</label> Private: <input type="checkbox" name="security" value="True"/>
+{#                Public <input type="radio" id="id_security" name="security" value="False" checked>#}
+{#                Private <input type="radio" id="id_security" name="security" value="True">#}
                 <br>
                 <input class="btn btn-default" type="submit" name="submit" value="Submit"/>
             </form>

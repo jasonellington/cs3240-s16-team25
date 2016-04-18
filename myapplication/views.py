@@ -138,8 +138,11 @@ def new_report(request):
                     report.encrypted = request.POST.get('encrypted')
                 else:
                     report.encrypted = False
+                if request.POST.get('security'):
+                    report.security = request.POST.get('security')
+                else:
+                    report.security = False
                 report.content = request.POST.get('content')
-                report.security = request.POST.get('security')
                 report.description = request.POST.get('description')
                 report.save()
                 for count, x in enumerate(request.FILES.getlist("files")):
@@ -156,27 +159,30 @@ def new_report(request):
 
 def edit_report(request):
     if request.user.is_authenticated():
-        r = Report.objects.get(id=request.POST.get('reportID'))
+        if request.POST.get('reportID'):
+            r = Report.objects.get(id=request.POST.get('reportID'))
+            context_dict = {'report' : r}
+            return render(request, 'editreport.html', context_dict)
         if request.method == 'POST':
-            if request.POST.get('description'):
-                rep = Report.objects.get(id=request.POST.get('idreport'))
+            if request.POST.get('idme'):
+                rep = Report.objects.get(id=request.POST.get('idme'))
+                rep.encrypted = False
+                rep.security = False
                 if request.POST.get('encrypted'):
                     rep.encrypted = request.POST.get('encrypted')
-                else:
-                    rep.encrypted = False
+                if request.POST.get('security'):
+                    rep.security = request.POST.get('security')
                 rep.content = request.POST.get('content')
-                rep.security = request.POST.get('security')
                 rep.description = request.POST.get('description')
                 rep.save()
                 for count, x in enumerate(request.FILES.getlist("files")):
-                    report_file = ReportFile(reporter=r, file=x)
+                    report_file = ReportFile(reporter=rep, file=x)
                     report_file.save()
                     with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
                         for chunk in x.chunks():
                             destination.write(chunk)
-                return render(request, 'reports.html')
-        context_dict = {'report' : r}
-        return render(request, 'editreport.html', context_dict)
+            return render(request, 'editreport.html')
+
     else:
        return HttpResponse("You should not be here")
 
@@ -255,13 +261,6 @@ def messaging(request):
             except Exception as e:
                 print(e)
                 print("Key failed")
-
-
-
-
-
-
-
     return render(request, 'messaging.html', context_dict)
 
 
