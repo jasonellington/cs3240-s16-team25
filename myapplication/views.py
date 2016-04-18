@@ -154,6 +154,32 @@ def new_report(request):
         return HttpResponse("You must be logged in to submit a report")
 
 
+def edit_report(request):
+    if request.user.is_authenticated():
+        r = Report.objects.get(id=request.POST.get('reportID'))
+        if request.method == 'POST':
+            if request.POST.get('description'):
+                rep = Report.objects.get(id=request.POST.get('idreport'))
+                if request.POST.get('encrypted'):
+                    rep.encrypted = request.POST.get('encrypted')
+                else:
+                    rep.encrypted = False
+                rep.content = request.POST.get('content')
+                rep.security = request.POST.get('security')
+                rep.description = request.POST.get('description')
+                rep.save()
+                for count, x in enumerate(request.FILES.getlist("files")):
+                    report_file = ReportFile(reporter=r, file=x)
+                    report_file.save()
+                    with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
+                        for chunk in x.chunks():
+                            destination.write(chunk)
+                return render(request, 'reports.html')
+        context_dict = {'report' : r}
+        return render(request, 'editreport.html', context_dict)
+    else:
+       return HttpResponse("You should not be here")
+
 def make_manager(request):
     if request.method == 'POST':
         manager_list = User.objects.filter(is_staff=True)
@@ -242,6 +268,13 @@ def messaging(request):
 def reports(request):
     report_list=Report.objects.all()
     params = []
+    if request.method == 'POST':
+        if request.POST.get('delete-btn'):
+            reportid = request.POST.get('reportID')
+            try:
+                Report.objects.get(id=reportid).delete()
+            except User.DoesNotExist:
+                pass
     if request.method == 'POST':
         items = request.POST
         for item in items:
