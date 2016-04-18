@@ -316,6 +316,14 @@ def reports(request):
                     if str(report.author) != str(val):
                         exclude.append(str(report.author) + str(report.date))
         else:
+            continue
+    for param in params:
+        con = param["con"]
+        cat = param["cat"]
+        val = param["val"]
+        if val == "":
+            continue
+        if con == 'OR':
             if cat == "Description":
                 for report in report_list:
                     if str(report.description) == str(val):
@@ -342,8 +350,10 @@ def reports(request):
             else:
                 for report in report_list:
                     if str(report.author) == str(val):
-                        if str(report.author) + str(report.date) in exclude:
+                        if (str(report.author) + str(report.date)) in exclude:
                             exclude.remove(str(report.author) + str(report.date))
+        else:
+            continue
     for report in report_list:
         if str(report.author) + str(report.date) not in exclude:
             new_list.append(report)
