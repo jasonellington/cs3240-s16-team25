@@ -3,21 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from myapplication.models import Message, Report, PublicKey
+from myapplication.models import Message, Report, PublicKey, ReportFile
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm
 from Crypto.PublicKey import RSA
 from datetime import datetime
+from mysite import settings
 
 # Create your views here.
 
 def index(request):
     report_list=Report.objects.all()
-    report_form=ReportForm(data=request.POST)
-    if report_form.is_valid():
-        report = report_form.save(user=request.user)
-        report.save()
-    context_dict = {'Reports' : report_list, 'report_form' : report_form}
+    context_dict = {'Reports' : report_list}
 
     return render(request, 'index.html', context_dict)
 
@@ -131,6 +128,31 @@ def user_to_group(request):
                     pass
     return HttpResponseRedirect('/myapplication/manager')
 
+def new_report(request):
+    if request.user.is_authenticated():
+        report_form = ReportForm(data=request.POST)
+        if request.method == 'POST':
+            if request.POST.get('description'):
+                report = Report(author=request.user)
+                if request.POST.get('encrypted'):
+                    report.encrypted = request.POST.get('encrypted')
+                else:
+                    report.encrypted = False
+                report.content = request.POST.get('content')
+                report.security = request.POST.get('security')
+                report.description = request.POST.get('description')
+                report.save()
+                for count, x in enumerate(request.FILES.getlist("files")):
+                    report_file = ReportFile(reporter=report, file=x)
+                    report_file.save()
+                    with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
+                        for chunk in x.chunks():
+                            destination.write(chunk)
+        context_dict = {'Report_Form' : report_form}
+        return render(request, 'makereport.html', context_dict)
+    else:
+        return HttpResponse("You must be logged in to submit a report")
+
 
 def make_manager(request):
     if request.method == 'POST':
@@ -159,7 +181,7 @@ def messaging(request):
     #     Messages = []
     context_dict = {'messages' : Messages}
 
-    
+
 
     if request.method == 'POST':
         if request.POST.get('submit'):

@@ -11,4 +11,5 @@ urlpatterns = patterns('',
         url(r'^usergroup/$', views.user_to_group, name='addtogroup'),
         url(r'^makemanager/$', views.make_manager, name='makemanager'),
         url(r'^reports/$', views.reports, name='reports'),
+        url(r'^makereport/$', views.new_report, name='makemanager'),
                        )
