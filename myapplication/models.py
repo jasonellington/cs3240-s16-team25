@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
 # Create your models here.
 
 
@@ -20,3 +21,8 @@ class Report(models.Model):
     description = models.CharField(max_length=128)
     content = models.TextField()
     security = models.BooleanField(default=False)
+
+class PublicKey(models.Model):
+    user = models.CharField(max_length=30)
+    Nval = models.TextField()
+    Eval = models.TextField()

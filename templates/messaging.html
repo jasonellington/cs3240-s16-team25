@@ -93,6 +93,30 @@
 
     </div>
 
+
+    <div class="container">
+        <form id="key_form" method="post" action="/myapplication/messaging/"  enctype="multipart/form-data">
+            <h1>Set Public Key:</h1>
+                {% csrf_token %}
+                <input hidden type="text" name="user" value="{{ user }}">
+
+                <label for="Nval">N value:</label>
+                <textarea class="form-control" id="Nval" name="Nval" rows="3" ></textarea>
+                <br>
+
+                <label for="Eval">E value:</label>
+                <input class="form-control" id="Eval" name="Eval" type="text"/>
+                <br>
+
+
+
+            <!-- Provide a button to click to submit the form. -->
+            <input class="btn btn-default" type="submit" name="SetKey" value="Set Key"/>
+    </form>
+
+
+    </div>
+
 {% else %}
     <h1>You are not logged in</h1>
             <a href="/myapplication/register/">Register Here</a><br>

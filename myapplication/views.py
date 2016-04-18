@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from myapplication.models import Message, Report
+from myapplication.models import Message, Report, PublicKey
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm
+from Crypto.PublicKey import RSA
 
 
 # Create your views here.
@@ -157,6 +158,7 @@ def messaging(request):
     # except:
     #     Messages = []
     context_dict = {'messages' : Messages}
+
     
 
     if request.method == 'POST':
@@ -172,7 +174,7 @@ def messaging(request):
             else:
                 print(form.errors)
         if request.POST.get('delete-message'):
-            
+
 
             id = request.POST.get('id')
 
@@ -181,6 +183,35 @@ def messaging(request):
                 dump.delete()
             except:
                 print("delete failed")
+        if request.POST.get('SetKey'):
+            nValue = request.POST.get('Nval')
+            eValue = request.POST.get('Eval')
+            nValueI = int(nValue)
+            eValueI = int(eValue)
+            try:
+                RSA.construct((nValueI,eValueI))
+                print("RSA checked, making form")
+
+
+                if len(list(PublicKey.objects.filter(user = request.user.username).all())) ==0:
+                    public2 = PublicKey(user=request.user.username, Nval=nValue, Eval = eValue)
+                else:
+                    public2 = PublicKey.objects.filter(user=request.user.username)[0]
+                #public = form.save(commit=False)
+                # public2.user=request.user.username
+                # public2.Nval=nValue
+                # public2.Eval=eValue
+                print("saving...")
+                public2.save()
+                print("key saved")
+            except Exception as e:
+                print(e)
+                print("Key failed")
+
+
+
+
+
 
 
     return render(request, 'messaging.html', context_dict)
