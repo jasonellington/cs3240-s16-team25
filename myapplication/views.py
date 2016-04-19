@@ -73,6 +73,9 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/myapplication/')
 
+def settings(request):
+    return render(request, 'settings.html')
+
 
 def manager(request):
     if request.user.is_staff:

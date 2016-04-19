@@ -22,7 +22,10 @@
     <ul class="nav navbar-nav">
       <li class="active"><a href="/myapplication">Home</a></li>
         {%  if user.is_authenticated %}
-      <li><a href="/myapplication/manager">Manager</a></li>
+            {% if user.is_staff %}
+                <li><a href="/myapplication/manager">Manager</a></li>
+            {% else %}
+            {%  endif %}
       <li><a href="#">Groups</a></li>
       <li><a href="/myapplication/messaging">Messages</a></li>
       <li><a href="/myapplication/reports">Reports</a></li>
@@ -40,7 +43,7 @@
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
             <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="/myapplication/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                     <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </li>
