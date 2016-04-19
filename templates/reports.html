@@ -50,20 +50,21 @@
 <div class="container">
     <div class="container">
         <h1>Reports</h1>
+        <a class="btn btn-primary" href="/myapplication/makereport/" role="button">Create New Report</a>
         {% if user.is_authenticated %}
-            <h3>Filter:</h3>
+            <h3>Search:</h3>
             <form enctype="multipart/form-data" class="form-horizontal" id="filter-form" method="POST" action="/myapplication/reports/">
                 {% csrf_token %}
                 <div id="conditions">
                     <div class="row">
-                        <div class="col-xs-2">
+                        <div>
                             <div class="form-group">
                                 <input name="con1" value="AND" hidden>
                             </div>
                         </div>
                         <div class="col-xs-2">
                             <div class="form-group">
-                                <select name="cat1" class="form-control">
+                                <select name="cat1" class="form-control" id="Search">
                                     <option>Description</option>
                                     <option>Reporter</option>
                                     <option>Created After</option>
@@ -135,9 +136,6 @@
                     </tbody>
                 </table>
             {% endif %}
-            <br>
-            <a href="/myapplication/makereport/">Make a New Report</a>
-            <br>
             <br>
         {% else %}
             <h1>You are not logged in</h1>
