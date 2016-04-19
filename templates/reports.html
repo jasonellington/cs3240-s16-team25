@@ -89,7 +89,7 @@
                         <th>Date</th>
                         <th>Content</th>
                         <th>Private</th>
-                        <th>Enc</th>
+                        <th>View</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
@@ -101,7 +101,14 @@
                             <td>{{ report.date }}</td>
                             <td>{{ report.content }}</td>
                             <td>{{ report.security }}</td>
-                            <td>{{ report.encrypted }}</td>
+                            <td><form class="view-form" action="../viewreport/" method="post">
+                                    {% csrf_token %}
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="view-btn" value="Click" type="submit"
+                                            class="btn btn-danger delete-btn">
+                                    View
+                                    </button>
+                            </form></td>
                             <td>{% if report.author.username == user.username %}
                             <form class="edit-form" action="../editreport/" method="post">
                                     {% csrf_token %}
