@@ -14,4 +14,5 @@ urlpatterns = patterns('',
         url(r'^reports/$', views.reports, name='reports'),
         url(r'^makereport/$', views.new_report, name='makemanager'),
         url(r'^editreport/$', views.edit_report, name='editreport'),
+        url(r'^viewreport/$', views.view_report, name='viewreport'),
                        )

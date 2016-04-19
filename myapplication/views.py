@@ -189,6 +189,18 @@ def edit_report(request):
     else:
        return HttpResponse("You should not be here")
 
+def view_report(request):
+    if request.user.is_authenticated():
+        if request.POST.get('reportID'):
+            r = Report.objects.get(id=request.POST.get('reportID'))
+            files = ReportFile.objects.filter(reporter=r)
+            context_dict = {'report' : r, 'files' : files}
+            return render(request, 'viewreport.html', context_dict)
+        return render(request, 'viewreport.html')
+    else:
+        return HttpResponse("You should not be here")
+
+
 def make_manager(request):
     if request.method == 'POST':
         manager_list = User.objects.filter(is_staff=True)
