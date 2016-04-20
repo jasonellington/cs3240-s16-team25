@@ -208,9 +208,10 @@ def make_manager(request):
 
 def messaging(request):
 
-    Messages = Message.objects.filter(recipient=request.user.username)
-    # except:
-    #     Messages = []
+    try:
+        Messages = Message.objects.filter(recipient=request.user.username)
+    except:
+         Messages = []
     context_dict = {'messages' : Messages}
 
 
@@ -223,6 +224,21 @@ def messaging(request):
             if form.is_valid():
                 send_message = form.save(commit=False)
                 send_message.sender = request.user.username
+                if send_message.encrypted:
+                    #print("fetching " + send_message.recipient + "'s public key")
+                    keys = PublicKey.objects.filter(user=send_message.recipient)
+                    if len(keys) ==0:
+                        send_message.encrypted=False
+                    else:
+                        pubkey = keys[0]
+                        #print("constructing key")
+                        public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
+                        #print("encrypting message")
+                        result = public.encrypt(str.encode(send_message.message),32)
+                        send_message.message="this is encrypted"
+                        send_message.bites=result[0]
+                        #print("message encrypted")
+
                 send_message.save()
 
             else:
@@ -237,6 +253,29 @@ def messaging(request):
                 dump.delete()
             except:
                 print("delete failed")
+
+        if request.POST.get('decrypt-message'):
+
+
+            Dval = int(request.POST.get('Dval'))
+            id = request.POST.get('id')
+            message = Message.objects.get(id=id)
+            Pubkey = PublicKey.objects.filter(user=request.user.username)[0]
+            Nval = int(Pubkey.Nval)
+            Eval = int(Pubkey.Eval)
+            print("constructing Key")
+            private = RSA.construct((Nval,Eval,Dval))
+            print("key constructed, decrypting")
+            bites = message.bites
+            message.message = private.decrypt(bites)
+            print("message decrypted")
+            message.encrypted= False
+            message.bites=None
+            message.save()
+
+
+
+
         if request.POST.get('SetKey'):
             nValue = request.POST.get('Nval')
             eValue = request.POST.get('Eval')

@@ -50,6 +50,9 @@
             <textarea class="form-control" id="message" name="message" rows="3" ></textarea>
             <br>
 
+            <label for="encrypted">Encrypt:</label>
+            <input class="vcheckboxfield" id="encrypted" name="encrypted" type="checkbox" />
+
             <!-- Provide a button to click to submit the form. -->
             <input class="btn btn-default" type="submit" name="submit" value="Send Message"/>
     </form>
@@ -68,7 +71,16 @@
                 {% for item in messages %}
                     <tr>
                         <td>{{ item.sender }}</td>
-                        <td>{{ item.message }}</td>
+                        <td>
+                            {% if item.encrypted %}
+                                Encrypted Message
+                            {% else %}
+                                {{ item.message }}
+
+                            {% endif %}
+
+
+                        </td>
 
                         <td>
                             <form class="delete-message" action="#" method="post">
@@ -81,6 +93,26 @@
                                     </button>
 
                             </form><br>
+                        </td>
+
+                        <td>
+                            {% if item.encrypted %}
+                            <form class="decrypt-message" action="#" method="post">
+                                {% csrf_token %}
+                                <textarea class="form-control" id="Dval" name="Dval" rows="3" > Dval</textarea>
+                                <br>
+
+                                <input hidden type="text" name="id" value="{{ item.id }}">
+
+                                <button name="decrypt-message" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                        Decrypt Message
+                                    </button>
+
+                            </form>
+
+                            {% endif %}
+
                         </td>
 
                     </tr>

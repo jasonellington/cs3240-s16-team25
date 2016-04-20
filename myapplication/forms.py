@@ -20,7 +20,7 @@ class SendMessage(forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = ('recipient', 'message')
+        fields = ('recipient', 'message','encrypted')
 
 
 class GroupForm(forms.ModelForm):
