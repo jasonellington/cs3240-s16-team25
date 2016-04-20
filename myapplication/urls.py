@@ -15,4 +15,7 @@ urlpatterns = patterns('',
         url(r'^makereport/$', views.new_report, name='makemanager'),
         url(r'^editreport/$', views.edit_report, name='editreport'),
         url(r'^viewreport/$', views.view_report, name='viewreport'),
+        url(r'^makefolder/$', views.new_folder, name='newfolder'),
+        url(r'^addtofolder/$', views.edit_folder, name='addtofolder'),
+        url(r'^viewfolder/$', views.view_folder, name='viewfolder'),
                        )
