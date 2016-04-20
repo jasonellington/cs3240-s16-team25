@@ -128,6 +128,7 @@
 
         <!-- Groups-->
         {% if groups %}
+            <h3>Groups: </h3>
             <table class="table table-striped table-hover">
                 <thead>
                 <tr>
@@ -140,8 +141,8 @@
                 {% for group in groups %}
                     <tr>
                         <td>{{ group.name }}</td>
-                        <td><a href="#">Group List</a></td>
-                        <td><a href="#">Reports List</a></td>
+                        <td><a class="btn btn-primary" href="#" role="button">Members</a></td>
+                       <td><a class="btn btn-primary" href="#" role="button">Reports</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
