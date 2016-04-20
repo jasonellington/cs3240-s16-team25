@@ -33,3 +33,8 @@ class PublicKey(models.Model):
 class ReportFile(models.Model):
     reporter = models.ForeignKey(Report)
     file = models.FileField()
+
+class ReportFolder(models.Model):
+    owner = models.ForeignKey(User, null=True)
+    name = models.CharField(max_length=50)
+    reports = models.ManyToManyField(Report)

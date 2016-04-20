@@ -15,16 +15,22 @@
 <body>
 <div>
     <nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">SafeCollab</a>
-    </div>
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/myapplication">SafeCollab</a>
+        </div>
     <ul class="nav navbar-nav">
       <li class="active"><a href="/myapplication">Home</a></li>
-      <li><a href="/myapplication/manager">Manager</a></li>
+        {%  if user.is_authenticated %}
+            {% if user.is_staff %}
+                <li><a href="/myapplication/manager">Manager</a></li>
+            {% else %}
+            {%  endif %}
       <li><a href="#">Groups</a></li>
       <li><a href="/myapplication/messaging">Messages</a></li>
       <li><a href="/myapplication/reports">Reports</a></li>
+        {%  else %}
+        {%  endif %}
     </ul>
       <form role="search" class="navbar-form navbar-right">
                 <div class="form-group">
@@ -32,15 +38,26 @@
                 </div>
             </form>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        {% if user.is_authenticated %}
+            <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
+            <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/myapplication/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                </ul>
+            </li>
+        {% else %}
+            <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        {% endif %}
     </ul>
   </div>
 </nav>
 </div>
 <div class="cotainer">
     <div class="container">
-        <h1>Home Page</h1>
         {% if user.is_authenticated %}
+            <h1>Home Page</h1>
             <p>You are logged in as {{ user.username }}!</p>
              <h3>Reports</h3>
             {% if Reports %}
@@ -95,8 +112,27 @@
             <input class="btn btn-default" type="submit" name="submit" value="Submit"/>
             </form>
         {% else %}
-            <h1>You are not logged in</h1>
-            <a href="/myapplication/register/">Register Here</a><br>
+            {% if registered %}
+            <strong>Thank you for registering!</strong>
+            <a href="/myapplication/">Return to the homepage.</a><br/>
+            {% else %}
+                <form id="user_form" method="post" action="/myapplication/register/" enctype="multipart/form-data">
+                    <h1>Register:</h1>
+                    {% csrf_token %}
+
+                    <label for="id_username">Username:</label>
+                    <input class="form-control" id="id_username" maxlength="30" name="username" type="text"/>
+                    <br>
+                    <label for="id_email">Email address:</label>
+                    <input class="form-control" id="id_email" maxlength="75" name="email" type="email"/>
+                    <br>
+                    <label for="id_password">Password:</label>
+                    <input class="form-control" id="id_password" name="password" type="password"/>
+                    <br>
+                    <!-- Provide a button to click to submit the form. -->
+                    <input class="btn btn-default" type="submit" name="submit" value="Register"/>
+                </form>
+            {% endif %}
         {% endif %}
     </div>
 </div>
