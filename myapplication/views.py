@@ -3,6 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.template import RequestContext
+from rest_framework import status
+from rest_framework.exceptions import ParseError
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+
 from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, ReportFolderForm
@@ -447,24 +453,31 @@ def reports(request):
     return render(request, 'reports.html', context_dict)
 
 
-def fda_login(request):
-    print("TEST")
-    # if request.method == 'POST':
-    #     username = request.POTS.get('username', '').strip()
-    #     password = request.POTS.get('password', '').strip()
-        # if username and password:
-        #     user = authenticate(username=username, password=password)
-        #
-        #     if user:
-        #         if user.is_active:
-        #             login(self.request, user)
-        #             data = {'success': True}
-        #         else:
-        #             data = {'success': False, 'error': 'User is not active'}
-        #
-        #     else:
-        #         data = {'success': False, 'error': 'Wrong username and/or password'}
-        #
-        #     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+class TestView(APIView):
 
-    return HttpResponseBadRequest()
+    def get(self, request, format=None):
+        return Response({'detail': "GET Response"})
+
+    def post(self, request, format=None):
+        try:
+            data = request.DATA
+        except ParseError as error:
+            return Response(
+                            'Invalid JSON = {0}'.format(error.detail),
+                            status=status.HTTP_400_BAD_REQUEST
+                            )
+        if "user" not in data or "password" not in data:
+            return Response(
+                'Wrong credentials',
+                status=status.HTTP_404_NOT_FOUND
+            )
+        user = User.objects.first()
+        if not user:
+            return Response(
+                'No default user, please create one',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        token = Token.objects.get_or_create(user=user)
+        return Response({'detail': 'POST answer', 'token': token[0]})
+
