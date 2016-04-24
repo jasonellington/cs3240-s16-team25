@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.template import RequestContext
 from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder
 from django.contrib.auth.models import User, Group
@@ -445,3 +445,26 @@ def reports(request):
     context_dict = {"Reports": new_list, "Folders": folder_list}
 
     return render(request, 'reports.html', context_dict)
+
+
+def fda_login(request):
+    print("TEST")
+    # if request.method == 'POST':
+    #     username = request.POTS.get('username', '').strip()
+    #     password = request.POTS.get('password', '').strip()
+        # if username and password:
+        #     user = authenticate(username=username, password=password)
+        #
+        #     if user:
+        #         if user.is_active:
+        #             login(self.request, user)
+        #             data = {'success': True}
+        #         else:
+        #             data = {'success': False, 'error': 'User is not active'}
+        #
+        #     else:
+        #         data = {'success': False, 'error': 'Wrong username and/or password'}
+        #
+        #     return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+    return HttpResponseBadRequest()
