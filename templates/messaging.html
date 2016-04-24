@@ -6,22 +6,31 @@
     {% load staticfiles %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static "styles.css" %}">
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-
 <div>
     <nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">SafeCollab</a>
-    </div>
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/myapplication">SafeCollab</a>
+        </div>
     <ul class="nav navbar-nav">
       <li><a href="/myapplication">Home</a></li>
-      <li><a href="/myapplication/manager">Manager</a></li>
+        {%  if user.is_authenticated %}
+            {% if user.is_staff %}
+                <li><a href="/myapplication/manager">Manager</a></li>
+            {% else %}
+            {%  endif %}
       <li><a href="#">Groups</a></li>
       <li class="active"><a href="/myapplication/messaging">Messages</a></li>
       <li><a href="/myapplication/reports">Reports</a></li>
+        {%  else %}
+        {%  endif %}
     </ul>
       <form role="search" class="navbar-form navbar-right">
                 <div class="form-group">
@@ -29,7 +38,18 @@
                 </div>
             </form>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+        {% if user.is_authenticated %}
+            <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
+            <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/myapplication/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                </ul>
+            </li>
+        {% else %}
+            <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        {% endif %}
     </ul>
   </div>
 </nav>
@@ -50,6 +70,9 @@
             <textarea class="form-control" id="message" name="message" rows="3" ></textarea>
             <br>
 
+            <label for="encrypted">Encrypt:</label>
+            <input class="vcheckboxfield" id="encrypted" name="encrypted" type="checkbox" />
+
             <!-- Provide a button to click to submit the form. -->
             <input class="btn btn-default" type="submit" name="submit" value="Send Message"/>
     </form>
@@ -68,7 +91,16 @@
                 {% for item in messages %}
                     <tr>
                         <td>{{ item.sender }}</td>
-                        <td>{{ item.message }}</td>
+                        <td>
+                            {% if item.encrypted %}
+                                Encrypted Message
+                            {% else %}
+                                {{ item.message }}
+
+                            {% endif %}
+
+
+                        </td>
 
                         <td>
                             <form class="delete-message" action="#" method="post">
@@ -81,6 +113,26 @@
                                     </button>
 
                             </form><br>
+                        </td>
+
+                        <td>
+                            {% if item.encrypted %}
+                            <form class="decrypt-message" action="#" method="post">
+                                {% csrf_token %}
+                                <textarea class="form-control" id="Dval" name="Dval" rows="3" > Dval</textarea>
+                                <br>
+
+                                <input hidden type="text" name="id" value="{{ item.id }}">
+
+                                <button name="decrypt-message" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                        Decrypt Message
+                                    </button>
+
+                            </form>
+
+                            {% endif %}
+
                         </td>
 
                     </tr>

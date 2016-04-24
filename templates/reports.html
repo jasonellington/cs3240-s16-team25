@@ -21,7 +21,10 @@
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="/myapplication">Home</a></li>
-                <li><a href="/myapplication/manager">Manager</a></li>
+                    {% if user.is_staff %}
+                        <li><a href="/myapplication/manager">Manager</a></li>
+                    {% else %}
+                    {%  endif %}
                 <li><a href="#">Groups</a></li>
                 <li><a href="/myapplication/messaging">Messages</a></li>
                 <li class="active"><a href="/myapplication/reports">Reports</a></li>
@@ -32,28 +35,37 @@
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-            </ul>
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="/myapplication/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+          <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        </ul>
+      </li>
+    </ul>
         </div>
     </nav>
 </div>
 <div class="container">
     <div class="container">
         <h1>Reports</h1>
+        <a class="btn btn-primary" href="/myapplication/makereport/" role="button">Create New Report</a>
+    <a class="btn btn-primary" href="/myapplication/makefolder/" role="button">Create New Folder</a>
         {% if user.is_authenticated %}
-            <h3>Filter:</h3>
+            <h3>Search:</h3>
             <form enctype="multipart/form-data" class="form-horizontal" id="filter-form" method="POST" action="/myapplication/reports/">
                 {% csrf_token %}
                 <div id="conditions">
                     <div class="row">
-                        <div class="col-xs-2">
+                        <div>
                             <div class="form-group">
                                 <input name="con1" value="AND" hidden>
                             </div>
                         </div>
                         <div class="col-xs-2">
                             <div class="form-group">
-                                <select name="cat1" class="form-control">
+                                <select name="cat1" class="form-control" id="Search">
                                     <option>Description</option>
                                     <option>Reporter</option>
                                     <option>Created After</option>
@@ -73,6 +85,51 @@
                 <button id="add-field" type="button" class="btn btn-default">Add Field</button>
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
+            {% if Folders %}
+                <table class="table table-striped table-hover">
+                <h3>Folders</h3>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>View</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for folder in Folders %}
+                    <tr>
+                        <td>{{ folder.name }}</td>
+                        <td><form class="viewfolder-form" action="/myapplication/viewfolder/" method="post">
+                                {% csrf_token %}
+                                <input hidden type="text" name="folderID" value="{{ folder.id }}">
+                                <button name="view-btn" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                View
+                                </button>
+                            </form>
+                        </td>
+                        <td><form class="editfolder-form" action="/myapplication/addtofolder/" method="post">
+                                {% csrf_token %}
+                                <input hidden type="text" name="folderID" value="{{ folder.id }}">
+                                <button name="view-btn" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                Edit
+                                </button>
+                            </form>
+                            <form class="viewfolder-form" action="#" method="post">
+                                {% csrf_token %}
+                                <input hidden type="text" name="folderID" value="{{ folder.id }}">
+                                <button name="view-btn" value="Click" type="submit"
+                                        class="btn btn-danger delete-btn">
+                                Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            {% endif %}
             {% if Reports %}
                 <table class="table table-striped table-hover">
                     <thead>
@@ -82,7 +139,7 @@
                         <th>Date</th>
                         <th>Content</th>
                         <th>Private</th>
-                        <th>Enc</th>
+                        <th>View</th>
                         <th>Edit</th>
                     </tr>
                     </thead>
@@ -94,7 +151,14 @@
                             <td>{{ report.date }}</td>
                             <td>{{ report.content }}</td>
                             <td>{{ report.security }}</td>
-                            <td>{{ report.encrypted }}</td>
+                            <td><form class="view-form" action="../viewreport/" method="post">
+                                    {% csrf_token %}
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="view-btn" value="Click" type="submit"
+                                            class="btn btn-danger delete-btn">
+                                    View
+                                    </button>
+                            </form></td>
                             <td>{% if report.author.username == user.username %}
                             <form class="edit-form" action="../editreport/" method="post">
                                     {% csrf_token %}
@@ -118,9 +182,6 @@
                     </tbody>
                 </table>
             {% endif %}
-            <br>
-            <a href="/myapplication/makereport/">Make a New Report</a>
-            <br>
             <br>
         {% else %}
             <h1>You are not logged in</h1>

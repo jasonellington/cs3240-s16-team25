@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from myapplication.models import Message,Report
+from myapplication.models import Message,Report, ReportFolder
 from django.contrib.auth.models import User, Group
 
 
@@ -11,6 +11,12 @@ class UserForm(forms.ModelForm):
         model = User
         fields = ('username', 'email', 'password')
 
+class ReportFolderForm(forms.ModelForm):
+    name = forms.CharField(max_length=50)
+
+    class Meta:
+        model = ReportFolder
+        fields = ('name',)
 
 class SendMessage(forms.ModelForm):
 
@@ -20,7 +26,7 @@ class SendMessage(forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = ('recipient', 'message')
+        fields = ('recipient', 'message','encrypted')
 
 
 class GroupForm(forms.ModelForm):

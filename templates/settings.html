@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "styles.css" %}">
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div>
+    <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/myapplication">SafeCollab</a>
+        </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="/myapplication">Home</a></li>
+        {%  if user.is_authenticated %}
+            {% if user.is_staff %}
+                <li><a href="/myapplication/manager">Manager</a></li>
+            {% else %}
+            {%  endif %}
+      <li><a href="#">Groups</a></li>
+      <li><a href="/myapplication/messaging">Messages</a></li>
+      <li><a href="/myapplication/reports">Reports</a></li>
+        {%  else %}
+        {%  endif %}
+    </ul>
+      <form role="search" class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input type="text" placeholder="Search" class="form-control">
+                </div>
+            </form>
+    <ul class="nav navbar-nav navbar-right">
+        {% if user.is_authenticated %}
+            <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
+            <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/myapplication/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="/myapplication/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                </ul>
+            </li>
+        {% else %}
+            <li><a href="/myapplication/login"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        {% endif %}
+    </ul>
+  </div>
+</nav>
+</div>
+
+<form id="user_form" method="post" action="/myapplication/settings/"
+          enctype="multipart/form-data">
+        <h1>Settings:</h1>
+        {% csrf_token %}
+        <label for="id_password">New Password:</label>
+        <input class="form-control" id="id_password" name="chang_password"/>
+        <!-- Provide a button to click to submit the form. -->
+        <input class="btn btn-default" type="submit" name="submit" value="Change Password"/>
+    </form>
+
+</body>
+</html>

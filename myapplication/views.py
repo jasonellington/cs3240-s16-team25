@@ -3,9 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from myapplication.models import Message, Report, PublicKey, ReportFile
+from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder
 from django.contrib.auth.models import User, Group
-from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm
+from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, ReportFolderForm
 from Crypto.PublicKey import RSA
 from datetime import datetime
 from mysite import settings
@@ -73,6 +73,9 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/myapplication/')
 
+def settings(request):
+    return render(request, 'settings.html')
+
 
 def manager(request):
     if request.user.is_staff:
@@ -130,7 +133,6 @@ def user_to_group(request):
 
 def new_report(request):
     if request.user.is_authenticated():
-        report_form = ReportForm(data=request.POST)
         if request.method == 'POST':
             if request.POST.get('description'):
                 report = Report(author=request.user)
@@ -148,11 +150,7 @@ def new_report(request):
                 for count, x in enumerate(request.FILES.getlist("files")):
                     report_file = ReportFile(reporter=report, file=x)
                     report_file.save()
-                    with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
-                        for chunk in x.chunks():
-                            destination.write(chunk)
-        context_dict = {'Report_Form' : report_form}
-        return render(request, 'makereport.html', context_dict)
+        return render(request, 'makereport.html')
     else:
         return HttpResponse("You must be logged in to submit a report")
 
@@ -186,6 +184,52 @@ def edit_report(request):
     else:
        return HttpResponse("You should not be here")
 
+def view_report(request):
+    if request.user.is_authenticated():
+        if request.POST.get('reportID'):
+            r = Report.objects.get(id=request.POST.get('reportID'))
+            files = ReportFile.objects.filter(reporter=r)
+            context_dict = {'report' : r, 'files' : files}
+            return render(request, 'viewreport.html', context_dict)
+        return render(request, 'viewreport.html')
+    else:
+        return HttpResponse("You should not be here")
+
+
+def new_folder(request):
+    if request.user.is_authenticated():
+        if request.method == 'POST':
+            folder_form = ReportFolderForm(data=request.POST)
+            if folder_form.is_valid():
+                f = folder_form.save()
+                f.owner = request.user
+                f.save()
+            context_dict = {'folder_form' : folder_form}
+            return render(request, 'makefolder.html', context_dict)
+        return render(request, 'makefolder.html')
+    else:
+        return HttpResponse("You should not be here")
+
+def edit_folder(request):
+    if request.POST.get('folderID'):
+        userreports = Report.objects.filter(author_id=request.user.id)
+        folder = ReportFolder.objects.get(id=request.POST.get('folderID'))
+        context_dict = {'reports' : userreports, 'folder' : folder}
+        if request.POST.get('reportID'):
+            folder.reports.add(Report.objects.get(id=request.POST.get('reportID')))
+        return render(request, 'addtofolder.html', context_dict)
+    else:
+        return HttpResponse("You should not be here")
+
+def view_folder(request):
+    if request.POST.get('folderID'):
+        folder = ReportFolder.objects.get(id=request.POST.get('folderID'))
+        folderreports = folder.reports.all()
+        context_dict = {'reports' : folderreports, 'folder' : folder}
+        return render(request, 'viewfolder.html', context_dict)
+    else:
+        return HttpResponse("You should not be here")
+
 def make_manager(request):
     if request.method == 'POST':
         manager_list = User.objects.filter(is_staff=True)
@@ -208,9 +252,10 @@ def make_manager(request):
 
 def messaging(request):
 
-    Messages = Message.objects.filter(recipient=request.user.username)
-    # except:
-    #     Messages = []
+    try:
+        Messages = Message.objects.filter(recipient=request.user.username)
+    except:
+         Messages = []
     context_dict = {'messages' : Messages}
 
 
@@ -223,6 +268,21 @@ def messaging(request):
             if form.is_valid():
                 send_message = form.save(commit=False)
                 send_message.sender = request.user.username
+                if send_message.encrypted:
+                    #print("fetching " + send_message.recipient + "'s public key")
+                    keys = PublicKey.objects.filter(user=send_message.recipient)
+                    if len(keys) ==0:
+                        send_message.encrypted=False
+                    else:
+                        pubkey = keys[0]
+                        #print("constructing key")
+                        public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
+                        #print("encrypting message")
+                        result = public.encrypt(str.encode(send_message.message),32)
+                        send_message.message="this is encrypted"
+                        send_message.bites=result[0]
+                        #print("message encrypted")
+
                 send_message.save()
 
             else:
@@ -237,6 +297,29 @@ def messaging(request):
                 dump.delete()
             except:
                 print("delete failed")
+
+        if request.POST.get('decrypt-message'):
+
+
+            Dval = int(request.POST.get('Dval'))
+            id = request.POST.get('id')
+            message = Message.objects.get(id=id)
+            Pubkey = PublicKey.objects.filter(user=request.user.username)[0]
+            Nval = int(Pubkey.Nval)
+            Eval = int(Pubkey.Eval)
+            print("constructing Key")
+            private = RSA.construct((Nval,Eval,Dval))
+            print("key constructed, decrypting")
+            bites = message.bites
+            message.message = private.decrypt(bites)
+            print("message decrypted")
+            message.encrypted= False
+            message.bites=None
+            message.save()
+
+
+
+
         if request.POST.get('SetKey'):
             nValue = request.POST.get('Nval')
             eValue = request.POST.get('Eval')
@@ -266,6 +349,7 @@ def messaging(request):
 
 def reports(request):
     report_list=Report.objects.all()
+    folder_list = ReportFolder.objects.filter(owner_id=request.user.id)
     params = []
     if request.method == 'POST':
         if request.POST.get('delete-btn'):
@@ -358,6 +442,6 @@ def reports(request):
         if str(report.author) + str(report.date) not in exclude:
             new_list.append(report)
 
-    context_dict = {"Reports": new_list}
+    context_dict = {"Reports": new_list, "Folders": folder_list}
 
     return render(request, 'reports.html', context_dict)
