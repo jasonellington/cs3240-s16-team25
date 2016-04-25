@@ -80,6 +80,13 @@ def user_logout(request):
     return HttpResponseRedirect('/myapplication/')
 
 def settings(request):
+    if request.method == 'POST':
+        if request.POST['change_password']:
+            new_pass = request.POST['change_password']
+            u = request.user
+            u.set_password(new_pass)
+            u.save()
+            return HttpResponseRedirect('/myapplication/')
     return render(request, 'settings.html')
 
 

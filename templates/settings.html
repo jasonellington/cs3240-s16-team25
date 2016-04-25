@@ -60,10 +60,20 @@
         <h1>Settings:</h1>
         {% csrf_token %}
         <label for="id_password">New Password:</label>
-        <input class="form-control" id="id_password" name="chang_password"/>
+        <input type="password" class="form-control" id="id_password" name="change_password"/>
+    <label for="reenter_password">Reenter New Password:</label>
+        <input type="password" class="form-control" id="reenter_password" name="reenter_password"/>
         <!-- Provide a button to click to submit the form. -->
-        <input class="btn btn-default" type="submit" name="submit" value="Change Password"/>
+        <br><input class="btn btn-default" type="submit" name="submit" value="Change Password"/>
     </form>
 
+<script type="text/javascript">
+    $("#user_form").submit(function(e) {
+        if ($("#id_password").val() != $("#reenter_password").val()) {
+            e.preventDefault();
+            alert("Passwords do not match")
+        }
+    });
+</script>
 </body>
 </html>
