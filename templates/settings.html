@@ -54,10 +54,10 @@
   </div>
 </nav>
 </div>
-
+<div id="user_form" class="content">
 <form id="user_form" method="post" action="/myapplication/settings/"
           enctype="multipart/form-data">
-        <h1>Settings:</h1>
+        <h3>Change Password:</h3>
         {% csrf_token %}
         <label for="id_password">New Password:</label>
         <input type="password" class="form-control" id="id_password" name="change_password"/>
@@ -66,6 +66,26 @@
         <!-- Provide a button to click to submit the form. -->
         <br><input class="btn btn-default" type="submit" name="submit" value="Change Password"/>
     </form>
+
+        <form id="key_form" method="post" action="/myapplication/messaging/"  enctype="multipart/form-data">
+            <h3>Initialize Public Key:</h3>
+                {% csrf_token %}
+                <input hidden type="text" name="user" value="{{ user }}">
+
+                <label for="Nval">N value:</label>
+                <textarea class="form-control" id="Nval" name="Nval" rows="3" ></textarea>
+                <br>
+
+                <label for="Eval">E value:</label>
+                <input class="form-control" id="Eval" name="Eval" type="text"/>
+                <br>
+
+
+
+            <!-- Provide a button to click to submit the form. -->
+            <input class="btn btn-default" type="submit" name="SetKey" value="Set Key"/>
+    </form>
+</div>
 
 <script type="text/javascript">
     $("#user_form").submit(function(e) {
