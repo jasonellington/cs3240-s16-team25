@@ -144,6 +144,30 @@ def user_to_group(request):
                     pass
     return HttpResponseRedirect('/myapplication/manager')
 
+def group_to_report(request):
+    if request.method == 'POST':
+            if request.POST.get('report-group-btn'):
+                group_name = request.POST.get('group-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportid'))
+                    r.groups.add(group_name)
+                    r.save()
+                except Group.DoesNotExist:
+                    pass
+    return HttpResponseRedirect('/myapplication/reports')
+
+def user_to_report(request):
+    if request.method == 'POST':
+            if request.POST.get('report-user-btn'):
+                user_name = request.POST.get('user-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportid'))
+                    r.groups.add(user_name)
+                    r.save()
+                except User.DoesNotExist:
+                    pass
+    return HttpResponseRedirect('/myapplication/reports')
+
 def new_report(request):
     if request.user.is_authenticated():
         if request.method == 'POST':
@@ -361,7 +385,7 @@ def messaging(request):
 
 
 def reports(request):
-    report_list=Report.objects.all()
+    report_list=Report.objects.filter(security=False)
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)
     params = []
     if request.method == 'POST':

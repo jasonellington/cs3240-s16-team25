@@ -49,6 +49,30 @@
                     <a href="{{ MEDIA_URL }}{{ f.file.name }}">{{ f.file.name }}</a>
                 {% endfor %}
             {% endif %}
+            {% if viewer.id == report.author.id %}
+                <h3>Give Permission to Groups</h3>
+                <form class="groupreport-form" action="/myapplication/groupreport/" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input hidden type="text" name="reportid" value="{{ report.id }}">
+                                    <input type="text" class="form-control group-name" name="group-name" placeholder="Enter Group Name">
+                                    <span class="input-group-btn">
+                                        <button name="report-group-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                </form>
+                <h3>Give Permission to Users</h3>
+                <form class="userreport-form" action="/myapplication/userreport/" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input hidden type="text" name="reportid" value="{{ report.id }}">
+                                    <input type="text" class="form-control group-name" name="user-name" placeholder="Enter User Name">
+                                    <span class="input-group-btn">
+                                        <button name="report-user-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                </form>
+            {% endif %}
 
         {% endif %}
 
