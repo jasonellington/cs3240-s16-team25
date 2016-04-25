@@ -18,5 +18,7 @@ urlpatterns = patterns('',
         url(r'^makefolder/$', views.new_folder, name='newfolder'),
         url(r'^addtofolder/$', views.edit_folder, name='addtofolder'),
         url(r'^viewfolder/$', views.view_folder, name='viewfolder'),
-        url(r'^testlogin/$', views.TestView.as_view(), name='testlogin'),
+        url(r'^fdalogin/$', views.fda_login, name='fdalogin'),
+        url(r'^fdalistreports/$', views.fda_list_reports, name='fdalistreports'),
+        url(r'^fdagetreport/$', views.fda_get_report, name='fdagetreport'),
                        )

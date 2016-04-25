@@ -1,13 +1,11 @@
+import json
+
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.template import RequestContext
-from rest_framework import status
-from rest_framework.exceptions import ParseError
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
+from django.core import serializers
 
 from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder
 from django.contrib.auth.models import User, Group
@@ -17,6 +15,8 @@ from datetime import datetime
 from mysite import settings
 
 # Create your views here.
+from mysite.settings import MEDIA_URL
+
 
 def index(request):
     report_list=Report.objects.all()
@@ -453,31 +453,69 @@ def reports(request):
     return render(request, 'reports.html', context_dict)
 
 
-class TestView(APIView):
+def fda_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
 
-    def get(self, request, format=None):
-        return Response({'detail': "GET Response"})
+        user = authenticate(username=username, password=password)
 
-    def post(self, request, format=None):
-        try:
-            data = request.DATA
-        except ParseError as error:
-            return Response(
-                            'Invalid JSON = {0}'.format(error.detail),
-                            status=status.HTTP_400_BAD_REQUEST
-                            )
-        if "user" not in data or "password" not in data:
-            return Response(
-                'Wrong credentials',
-                status=status.HTTP_404_NOT_FOUND
-            )
-        user = User.objects.first()
-        if not user:
-            return Response(
-                'No default user, please create one',
-                status=status.HTTP_404_NOT_FOUND
-            )
+        if user:
+            if user.is_active:
+                login(request, user)
+                data = {'success': True}
+            else:
+                data = {'success': False, 'error': 'User is not active'}
 
-        token = Token.objects.get_or_create(user=user)
-        return Response({'detail': 'POST answer', 'token': token[0]})
+        else:
+            data = {'success': False, 'error': 'Wrong username and/or password'}
 
+        return HttpResponse(json.dumps(data), content_type='application/json')
+
+    return HttpResponseBadRequest()
+
+
+def fda_list_reports(request):
+    if request.user.is_authenticated():
+        report_list = Report.objects.all()
+        reports = {'num': [], 'Description': [], 'Author': [], 'Date': [], 'Encrypted': [], 'Content': [], 'ID': []}
+        num = 0
+        for report in report_list:
+            num+=1
+            reports['num'].append(num)
+            reports['Description'].append(report.description)
+            reports['Author'].append(report.author.username)
+            reports['Date'].append(str(report.date)[:11])
+            reports['Encrypted'].append(report.encrypted)
+            reports['Content'].append(report.content)
+            reports['ID'].append(report.id)
+        data = {'success': True, 'reports': reports}
+    else:
+        data = {'success': False, 'error': 'User not authenticated'}
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def fda_get_report(request):
+    if request.user.is_authenticated():
+        report = Report.objects.get(id=request.GET.get('reportID'))
+        files = ReportFile.objects.filter(reporter=report)
+        r = {
+            'Description': report.description,
+            'Author': report.author.username,
+            'Date': str(report.date),
+            'Encrypted': report.encrypted,
+            'Content': report.content,
+            'ID': report.id
+        }
+        if files:
+            f = []
+            for file in files:
+                file_info = {
+                    'name': file.file.name,
+                    'url': file.file.url
+                }
+                f.append(file_info)
+            data = {'report' : r, 'files' : f}
+        else:
+            data = {'report' : r}
+        return HttpResponse(json.dumps(data), content_type='application/json')

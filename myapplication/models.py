@@ -29,6 +29,9 @@ class Report(models.Model):
     security = models.BooleanField(default=False)
     encrypted = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.description
+
 
 class PublicKey(models.Model):
     user = models.CharField(max_length=30)
