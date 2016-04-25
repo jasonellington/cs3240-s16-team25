@@ -13,7 +13,10 @@ from lxml import html
 from tabulate import tabulate
 from Crypto.Cipher import AES
 
-base_url = 'http://localhost:8000'
+remote_url = 'http://calm-tundra-99675.herokuapp.com/'
+local_url = 'http://localhost:8000'
+
+base_url = remote_url
 
 encrypt_file = False
 print("Welcome to SafeCollab File Download Application")
@@ -52,7 +55,7 @@ opener = urllib.request.build_opener(
     urllib.request.HTTPCookieProcessor,
 )
 
-login_form = opener.open('http://localhost:8000/myapplication/login/').read()
+login_form = opener.open(base_url + '/myapplication/login/').read()
 csrf_token = html.fromstring(login_form).xpath(
     '//input[@name="csrfmiddlewaretoken"]/@value'
 )[0]
@@ -65,7 +68,7 @@ values = {
 
 data = urllib.parse.urlencode(values)
 data = data.encode('utf-8')
-login_page = opener.open('http://localhost:8000/myapplication/fdalogin/', data)
+login_page = opener.open(base_url + '/myapplication/fdalogin/', data)
 
 # Use the following for debugging
 # try:
