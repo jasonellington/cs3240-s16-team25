@@ -550,3 +550,9 @@ def fda_get_report(request):
         else:
             data = {'report' : r}
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def groups(request):
+    group_list  =request.user.groups.all()
+    context_dict = {'groups': group_list}
+    return render(request, 'groups.html', context_dict)

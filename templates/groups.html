@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SafeCollab - Settings</title>
+    <title>Title</title>
     {% load staticfiles %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static "styles.css" %}">
@@ -20,18 +20,23 @@
             <a class="navbar-brand" href="/myapplication">SafeCollab</a>
         </div>
     <ul class="nav navbar-nav">
-      <li class="active"><a href="/myapplication">Home</a></li>
+      <li><a href="/myapplication">Home</a></li>
         {%  if user.is_authenticated %}
             {% if user.is_staff %}
                 <li><a href="/myapplication/manager">Manager</a></li>
             {% else %}
             {%  endif %}
       <li class="=active"><a href="/myapplication/groups">Groups</a></li>
-      <li><a href="/myapplication/messaging">Messages</a></li>
+      <li class="active"><a href="/myapplication/messaging">Messages</a></li>
       <li><a href="/myapplication/reports">Reports</a></li>
         {%  else %}
         {%  endif %}
     </ul>
+      <form role="search" class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input type="text" placeholder="Search" class="form-control">
+                </div>
+            </form>
     <ul class="nav navbar-nav navbar-right">
         {% if user.is_authenticated %}
             <li class="dropdown">
@@ -49,46 +54,40 @@
   </div>
 </nav>
 </div>
-<div id="user_form" class="content">
-<form id="user_form" method="post" action="/myapplication/settings/"
-          enctype="multipart/form-data">
-        <h3>Change Password:</h3>
-        {% csrf_token %}
-        <label for="id_password">New Password:</label>
-        <input type="password" class="form-control" id="id_password" name="change_password"/>
-    <label for="reenter_password">Reenter New Password:</label>
-        <input type="password" class="form-control" id="reenter_password" name="reenter_password"/>
-        <!-- Provide a button to click to submit the form. -->
-        <br><input class="btn btn-default" type="submit" name="submit" value="Change Password"/>
-    </form>
 
-        <form id="key_form" method="post" action="/myapplication/messaging/"  enctype="multipart/form-data">
-            <h3>Initialize Public Key:</h3>
-                {% csrf_token %}
-                <input hidden type="text" name="user" value="{{ user }}">
-
-                <label for="Nval">N value:</label>
-                <textarea class="form-control" id="Nval" name="Nval" rows="3" ></textarea>
-                <br>
-
-                <label for="Eval">E value:</label>
-                <input class="form-control" id="Eval" name="Eval" type="text"/>
-                <br>
+{% if user.is_authenticated %}
 
 
+    <div class="container">
+        {% if groups %}
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Group name</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.name}}</td>
+                    </tr>
 
-            <!-- Provide a button to click to submit the form. -->
-            <input class="btn btn-default" type="submit" name="SetKey" value="Set Key"/>
-    </form>
-</div>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
 
-<script type="text/javascript">
-    $("#user_form").submit(function(e) {
-        if ($("#id_password").val() != $("#reenter_password").val()) {
-            e.preventDefault();
-            alert("Passwords do not match")
-        }
-    });
-</script>
+    </div>
+
+
+
+
+{% else %}
+    <h1>You are not logged in</h1>
+            <a href="/myapplication/register/">Register Here</a><br>
+            <a href="/myapplication/login/">Login</a>
+{% endif %}
+
+
 </body>
 </html>
