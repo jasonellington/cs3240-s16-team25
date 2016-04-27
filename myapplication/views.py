@@ -13,6 +13,7 @@ from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, Re
 from Crypto.PublicKey import RSA
 from datetime import datetime
 from mysite import settings
+from django.db.models import Q
 
 # Create your views here.
 from mysite.settings import MEDIA_URL
@@ -150,7 +151,8 @@ def group_to_report(request):
                 group_name = request.POST.get('group-name')
                 try:
                     r = Report.objects.get(id=request.POST.get('reportid'))
-                    r.groups.add(group_name)
+                    potentialgroup= Group.objects.get(name=group_name)
+                    r.groups.add(potentialgroup)
                     r.save()
                 except Group.DoesNotExist:
                     pass
@@ -162,7 +164,8 @@ def user_to_report(request):
                 user_name = request.POST.get('user-name')
                 try:
                     r = Report.objects.get(id=request.POST.get('reportid'))
-                    r.groups.add(user_name)
+                    potentialuser = User.objects.get(username=user_name)
+                    r.users.add(potentialuser)
                     r.save()
                 except User.DoesNotExist:
                     pass
@@ -226,7 +229,8 @@ def view_report(request):
         if request.POST.get('reportID'):
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
-            context_dict = {'report' : r, 'files' : files}
+            viewer = request.user
+            context_dict = {'report' : r, 'files' : files, 'viewer' : viewer}
             return render(request, 'viewreport.html', context_dict)
         return render(request, 'viewreport.html')
     else:
@@ -385,7 +389,9 @@ def messaging(request):
 
 
 def reports(request):
-    report_list=Report.objects.filter(security=False)
+    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+    if request.user.is_staff:
+        report_list=Report.objects.all()
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)
     params = []
     if request.method == 'POST':
