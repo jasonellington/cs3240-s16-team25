@@ -199,7 +199,8 @@ def edit_report(request):
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
             r = Report.objects.get(id=request.POST.get('reportID'))
-            context_dict = {'report' : r}
+            files = ReportFile.objects.filter(reporter=r)
+            context_dict = {'report' : r, 'files' : files}
             return render(request, 'editreport.html', context_dict)
         if request.method == 'POST':
             if request.POST.get('idme'):
@@ -227,6 +228,29 @@ def edit_report(request):
 def view_report(request):
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
+            if request.POST.get('report-user-btn'):
+                user_name = request.POST.get('user-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportID'))
+                    potentialuser = User.objects.get(username=user_name)
+                    r.users.add(potentialuser)
+                    r.save()
+                except User.DoesNotExist:
+                    pass
+            if request.POST.get('report-group-btn'):
+                group_name = request.POST.get('group-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportID'))
+                    potentialgroup= Group.objects.get(name=group_name)
+                    r.groups.add(potentialgroup)
+                    r.save()
+                except Group.DoesNotExist:
+                    pass
+            if request.POST.get('deletefile-btn'):
+                try:
+                    rf =ReportFile.objects.get(id=request.POST.get('fileID')).delete()
+                except ReportFile.DoesNotExist:
+                    pass
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
             viewer = request.user
@@ -399,7 +423,7 @@ def reports(request):
             reportid = request.POST.get('reportID')
             try:
                 Report.objects.get(id=reportid).delete()
-            except User.DoesNotExist:
+            except Report.DoesNotExist:
                 pass
     if request.method == 'POST':
         items = request.POST
