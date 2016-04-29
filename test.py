@@ -159,6 +159,7 @@ class ReportsPage(Page):
 
     def load_data(self):
         list = json.loads(opener.open(base_url + '/myapplication/fdalistreports/').read().decode("utf-8"))
+        global data
         data = list['reports']
         for num in data['num']:
             desc = data['Description'][num - 1]
@@ -170,25 +171,59 @@ class ReportsPage(Page):
 
     def onDoubleClick(self, event):
         item = self.tree.selection()[0]
-        tm.showinfo("you clicked on", self.tree.item(item,"text"))
+        view_frame.lift()
+        view_frame.load_data(data, self.tree.item(item,"text"))
 
 
 class ViewPage(Page):
     def __init__(self, *args, **kwargs):
         Page.__init__(self, *args, **kwargs)
+
+        self.label_desc = Label(self, text="Description:", font="bold")
+        self.label_author = Label(self, text="Author:", font="bold")
+        self.label_date = Label(self, text="Date:", font="bold")
+        self.label_content = Label(self, text="Content:", font="bold")
+
+        self.label_desc.grid(row=0, sticky=E)
+        self.label_author.grid(row=1, sticky=E)
+        self.label_date.grid(row=2, sticky=E)
+        self.label_content.grid(row=3, sticky=E)
+
+        self.report_desc = StringVar()
+        self.report_author = StringVar()
+        self.report_date = StringVar()
+        self.report_content = StringVar()
+
+        self.val_desc = Label(self, textvariable=self.report_desc)
+        self.val_author = Label(self, textvariable=self.report_author)
+        self.val_date = Label(self, textvariable=self.report_date)
+        self.val_content = Label(self, textvariable=self.report_content)
+
+        self.val_desc.grid(row=0, column=2)
+        self.val_author.grid(row=1, column=2)
+        self.val_date.grid(row=2, column=2)
+        self.val_content.grid(row=3, column=2)
+
         self.pack()
 
-    def load_data(self):
-        list = json.loads(opener.open(base_url + '/myapplication/fdalistreports/').read().decode("utf-8"))
-        data = list['reports']
-        for num in data['num']:
-            desc = data['Description'][num - 1]
-            author = data['Author'][num - 1]
-            date = data['Date'][num - 1]
-            encrypted = data['Encrypted'][num - 1]
-            self.tree.insert("", num - 1, text=str(num), values=(desc, author, date, encrypted))
-
-
+    def load_data(self, data, report_num):
+        report_response = json.loads(opener.open(base_url + '/myapplication/fdagetreport?reportID=' + str(data['ID'][int(report_num)-1])).read().decode("utf-8"))
+        report = report_response['report']
+        print("\n============== REPORT ==============\n")
+        self.report_desc.set(report['Description'])
+        self.report_author.set(report['Author'])
+        self.report_date.set(report['Date'])
+        self.report_content.set(report['Content'])
+        files_present = False
+        if 'files' in report_response:
+            files_present = True
+            print("FILES:")
+            i = 0
+            for file in report_response['files']:
+                i+=1
+                print("\t" + str(i) + ": " + file['name'][2:])
+        else:
+            print("FILES: NONE")
 
 
 class MainView(Frame):
@@ -203,7 +238,7 @@ class MainView(Frame):
         login_frame = LoginPage(self)
         encrypt_frame = EncryptPage(self)
         reports_frame = ReportsPage(self)
-        view_frame = ReportsPage(self)
+        view_frame = ViewPage(self)
 
         buttonframe = Frame(self)
         container = Frame(self)

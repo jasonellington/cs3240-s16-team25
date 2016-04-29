@@ -549,7 +549,9 @@ def fda_login(request):
 
 def fda_list_reports(request):
     if request.user.is_authenticated():
-        report_list = Report.objects.all()
+        report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+        if request.user.is_staff:
+            report_list=Report.objects.all()
         reports = {'num': [], 'Description': [], 'Author': [], 'Date': [], 'Encrypted': [], 'Content': [], 'ID': []}
         num = 0
         for report in report_list:
