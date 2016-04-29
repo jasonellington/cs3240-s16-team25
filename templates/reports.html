@@ -114,10 +114,10 @@
                             </form>
                             </td>
                             <td>
-                            <form class="viewfolder-form" action="#" method="post">
+                            <form class="deletefolder-form" action="/myapplication/deletefolder/" method="post">
                                 {% csrf_token %}
                                 <input hidden type="text" name="folderID" value="{{ folder.id }}">
-                                <button name="view-btn" value="Click" type="submit"
+                                <button name="deletefolder-btn" value="Click" type="submit"
                                         class="btn btn-danger delete-btn">
                                 Delete
                                 </button>
@@ -174,7 +174,17 @@
                                     Delete
                                     </button>
                             </form>
-                        {% endif %}</td>
+                            {% elif user.is_staff %}
+                                <form class="delete-form" action="#" method="post">
+                            {% csrf_token %}
+                            <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="delete-btn" value="Click" type="submit"
+                                            class="btn btn-danger delete-btn">
+                                    Delete
+                                    </button>
+                            </form>
+                            {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

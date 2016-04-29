@@ -291,6 +291,16 @@ def edit_folder(request):
     else:
         return HttpResponse("You should not be here")
 
+def delete_folder(request):
+    if request.POST.get('folderID'):
+        try:
+            ReportFolder.objects.get(id=request.POST.get('folderID')).delete()
+        except: ReportFolder.DoesNotExist
+        return render(request, 'reports.html')
+    else:
+        return HttpResponse("You should not be here")
+
+
 def view_folder(request):
     if request.POST.get('folderID'):
         folder = ReportFolder.objects.get(id=request.POST.get('folderID'))
