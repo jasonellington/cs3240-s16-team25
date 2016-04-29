@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadReque
 from django.template import RequestContext
 from django.core import serializers
 
-from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder
+from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder, ReportComment
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, ReportFolderForm
 from Crypto.PublicKey import RSA
@@ -251,18 +251,32 @@ def view_report(request):
                     r.save()
                 except Group.DoesNotExist:
                     pass
+            if request.POST.get('comment-btn'):
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportID'))
+                    c = ReportComment(reporton=r, poster=request.user)
+                    c.comment=request.POST.get('comment')
+                    c.save()
+                except Report.DoesNotExist:
+                    pass
             if request.POST.get('deletefile-btn'):
                 try:
                     rf =ReportFile.objects.get(id=request.POST.get('fileID')).delete()
                 except ReportFile.DoesNotExist:
                     pass
+            if request.POST.get('deletecomment-btn'):
+                try:
+                    ReportComment.objects.get(id=request.POST.get('commentID')).delete()
+                except ReportComment.DoesNotExist:
+                    pass
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
+            comments = ReportComment.objects.filter(reporton=r)
             viewer = request.user
             x= r.views
             r.views= x + 1
             r.save()
-            context_dict = {'report' : r, 'files' : files, 'viewer' : viewer}
+            context_dict = {'report' : r, 'files' : files, 'viewer' : viewer, 'comments': comments}
             return render(request, 'viewreport.html', context_dict)
         return render(request, 'viewreport.html')
     else:
@@ -446,7 +460,7 @@ def messaging(request):
 
 
 def reports(request):
-    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all())).order_by('views')
+    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(author=request.user) | Q(groups=request.user.groups.all())).order_by('views')
     if request.user.is_staff:
         report_list=Report.objects.all()
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)

@@ -21,8 +21,11 @@
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="/myapplication">Home</a></li>
+                {% if user.is_staff %}
                 <li><a href="/myapplication/manager">Manager</a></li>
-                <li><a href="#">Groups</a></li>
+                {% else %}
+                {%  endif %}
+                <li><a href="/myapplication/groups">Groups</a></li>
                 <li><a href="/myapplication/messaging">Messages</a></li>
                 <li class="active"><a href="/myapplication/reports">Reports</a></li>
             </ul>
@@ -41,9 +44,9 @@
     <div class="container">
         {% if report %}
             <h1>{{ report.description }}</h1>
-            <p>Submitted on {{ report.date }} by {{ report.author }}</p>
+            <strong><p>Submitted on {{ report.date }} by {{ report.author }}</p></strong>
             <br>
-            <strong><p>{{ report.content }}</p></strong>
+            <p>{{ report.content }}</p>
             {% if files %}
                 {% for f in files %}
                     <a href="{{ MEDIA_URL }}{{ f.file.name }}">{{ f.file.name }}</a>
@@ -59,6 +62,53 @@
                     {% endif %}
                 {% endfor %}
             {% endif %}
+            <br><br><br><br>
+            <h3>Comments</h3>
+            <br>
+            {% if comments %}
+                <table class="table table-striped table-hover">
+                    <tbody>
+                        {% for c in comments %}
+                            <tr>
+                                <td>{{ c.comment }}</td>
+                                <td>{{ c.poster }}
+                                <td>{% if c.poster.username == user.username %}
+                                 <form class="deletecomment-form" action="#" method="post">
+                                    {% csrf_token %}
+                                    <input hidden type="text" name="commentID" value="{{ c.id }}">
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="deletecomment-btn" value="Click" type="submit" class="user-comment-btn btn btn-default">
+                                    Delete
+                                    </button>
+                                </form>
+                                {% elif report.author.username == user.username %}
+                                    <form class="deletecomment-form" action="#" method="post">
+                                    {% csrf_token %}
+                                    <input hidden type="text" name="commentID" value="{{ c.id }}">
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="deletecomment-btn" value="Click" type="submit" class="user-comment-btn btn btn-default">
+                                    Delete
+                                    </button>
+                                </form>
+                                {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            <br>
+            <form class="comment-form" action="#" method="post">
+                {% csrf_token %}
+                    <div class="input-group">
+                        <input hidden type="text" name="reportID" value="{{ report.id }}">
+                        <textarea class="form-control comment" name="comment" placeholder="Enter Comment..." rows="2"></textarea>
+                        <span class="input-group-addon">
+                            <button name="comment-btn" value="Click" class="user-comment-btn btn btn-default" type="submit">Comment</button>
+                        </span>
+                    </div>
+            </form>
+            <br>
             {% if viewer.id == report.author.id %}
                 <h3>Give Permission to Groups</h3>
                 <form class="groupreport-form" action="#" method="post">

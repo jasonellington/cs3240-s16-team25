@@ -45,6 +45,7 @@ class ReportFile(models.Model):
     file = models.FileField()
 
 
+
 class ReportFolder(models.Model):
     owner = models.ForeignKey(User, null=True)
     name = models.CharField(max_length=50)
