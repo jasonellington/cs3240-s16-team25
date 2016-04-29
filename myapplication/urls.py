@@ -21,4 +21,7 @@ urlpatterns = patterns('',
         url(r'^fdalogin/$', views.fda_login, name='fdalogin'),
         url(r'^fdalistreports/$', views.fda_list_reports, name='fdalistreports'),
         url(r'^fdagetreport/$', views.fda_get_report, name='fdagetreport'),
+        url(r'^userreport/$', views.user_to_report, name='usertoreport'),
+        url(r'^groupreport/$', views.group_to_report, name='grouptoreport'),
+        url(r'^groups/$', views.groups, name='groups')
                        )

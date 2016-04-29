@@ -13,6 +13,7 @@ from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, Re
 from Crypto.PublicKey import RSA
 from datetime import datetime
 from mysite import settings
+from django.db.models import Q
 
 # Create your views here.
 from mysite.settings import MEDIA_URL
@@ -144,6 +145,32 @@ def user_to_group(request):
                     pass
     return HttpResponseRedirect('/myapplication/manager')
 
+def group_to_report(request):
+    if request.method == 'POST':
+            if request.POST.get('report-group-btn'):
+                group_name = request.POST.get('group-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportid'))
+                    potentialgroup= Group.objects.get(name=group_name)
+                    r.groups.add(potentialgroup)
+                    r.save()
+                except Group.DoesNotExist:
+                    pass
+    return HttpResponseRedirect('/myapplication/reports')
+
+def user_to_report(request):
+    if request.method == 'POST':
+            if request.POST.get('report-user-btn'):
+                user_name = request.POST.get('user-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportid'))
+                    potentialuser = User.objects.get(username=user_name)
+                    r.users.add(potentialuser)
+                    r.save()
+                except User.DoesNotExist:
+                    pass
+    return HttpResponseRedirect('/myapplication/reports')
+
 def new_report(request):
     if request.user.is_authenticated():
         if request.method == 'POST':
@@ -172,7 +199,8 @@ def edit_report(request):
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
             r = Report.objects.get(id=request.POST.get('reportID'))
-            context_dict = {'report' : r}
+            files = ReportFile.objects.filter(reporter=r)
+            context_dict = {'report' : r, 'files' : files}
             return render(request, 'editreport.html', context_dict)
         if request.method == 'POST':
             if request.POST.get('idme'):
@@ -200,9 +228,33 @@ def edit_report(request):
 def view_report(request):
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
+            if request.POST.get('report-user-btn'):
+                user_name = request.POST.get('user-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportID'))
+                    potentialuser = User.objects.get(username=user_name)
+                    r.users.add(potentialuser)
+                    r.save()
+                except User.DoesNotExist:
+                    pass
+            if request.POST.get('report-group-btn'):
+                group_name = request.POST.get('group-name')
+                try:
+                    r = Report.objects.get(id=request.POST.get('reportID'))
+                    potentialgroup= Group.objects.get(name=group_name)
+                    r.groups.add(potentialgroup)
+                    r.save()
+                except Group.DoesNotExist:
+                    pass
+            if request.POST.get('deletefile-btn'):
+                try:
+                    rf =ReportFile.objects.get(id=request.POST.get('fileID')).delete()
+                except ReportFile.DoesNotExist:
+                    pass
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
-            context_dict = {'report' : r, 'files' : files}
+            viewer = request.user
+            context_dict = {'report' : r, 'files' : files, 'viewer' : viewer}
             return render(request, 'viewreport.html', context_dict)
         return render(request, 'viewreport.html')
     else:
@@ -269,7 +321,8 @@ def messaging(request):
         Messages = Message.objects.filter(recipient=request.user.username)
     except:
          Messages = []
-    context_dict = {'messages' : Messages}
+    Users = User.objects.all()
+    context_dict = {'messages' : Messages, 'users' :Users, 'NError': False, 'SError':False}
 
 
 
@@ -281,22 +334,32 @@ def messaging(request):
             if form.is_valid():
                 send_message = form.save(commit=False)
                 send_message.sender = request.user.username
-                if send_message.encrypted:
-                    #print("fetching " + send_message.recipient + "'s public key")
-                    keys = PublicKey.objects.filter(user=send_message.recipient)
-                    if len(keys) ==0:
-                        send_message.encrypted=False
+                if len(User.objects.filter(username=send_message.recipient)) == 0:
+                    context_dict['NError'] =True
+                    print("invalid recipient")
+                    pass
+                else:
+                    if send_message.encrypted:
+                        #print("fetching " + send_message.recipient + "'s public key")
+                        keys = PublicKey.objects.filter(user=send_message.recipient)
+                        if len(keys) ==0:
+                            context_dict['SError']=True
+                            print("Recipient's public key not set")
+                            send_message.encrypted=False
+                        else:
+                            pubkey = keys[0]
+                            #print("constructing key")
+                            public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
+                            #print("encrypting message")
+                            result = public.encrypt(str.encode(send_message.message),32)
+                            send_message.message="this is encrypted"
+                            send_message.bites=result[0]
+                            send_message.save()
+                            #print("message encrypted")
                     else:
-                        pubkey = keys[0]
-                        #print("constructing key")
-                        public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
-                        #print("encrypting message")
-                        result = public.encrypt(str.encode(send_message.message),32)
-                        send_message.message="this is encrypted"
-                        send_message.bites=result[0]
-                        #print("message encrypted")
+                        send_message.save()
 
-                send_message.save()
+
 
             else:
                 print(form.errors)
@@ -361,7 +424,9 @@ def messaging(request):
 
 
 def reports(request):
-    report_list=Report.objects.all()
+    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+    if request.user.is_staff:
+        report_list=Report.objects.all()
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)
     params = []
     if request.method == 'POST':
@@ -369,7 +434,7 @@ def reports(request):
             reportid = request.POST.get('reportID')
             try:
                 Report.objects.get(id=reportid).delete()
-            except User.DoesNotExist:
+            except Report.DoesNotExist:
                 pass
     if request.method == 'POST':
         items = request.POST
@@ -526,3 +591,9 @@ def fda_get_report(request):
         else:
             data = {'report' : r}
         return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def groups(request):
+    group_list  =request.user.groups.all()
+    context_dict = {'groups': group_list}
+    return render(request, 'groups.html', context_dict)

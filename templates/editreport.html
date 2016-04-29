@@ -48,7 +48,7 @@
                 <label for="id_content">Content:</label>
                 <textarea class="form-control" id="id_content" name="content" rows="12" >{{  report.content }}</textarea>
                 <label for="id_files">Files:</label> Encyrpted: <input type="checkbox" name="encrypted" value="True">
-                <input type="file" name="files" multiple/>
+                <input type="file" name="files" value="{{ files.all }}" multiple/>
                 <label for="id_security">Security:</label> Private: <input type="checkbox" name="security" value="True"/>
 {#                Public <input type="radio" id="id_security" name="security" value="False" checked/>#}
 {#                Private <input type="radio" id="id_security" name="security" value="True"/>#}

@@ -47,7 +47,41 @@
             {% if files %}
                 {% for f in files %}
                     <a href="{{ MEDIA_URL }}{{ f.file.name }}">{{ f.file.name }}</a>
+                    {% if report.author.username == user.username %}
+                         <form class="deletefile-form" action="#" method="post">
+                                    {% csrf_token %}
+                                    <input hidden type="text" name="fileID" value="{{ f.id }}">
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <button name="deletefile-btn" value="Click" type="submit">
+                                    X
+                                    </button>
+                                </form>
+                    {% endif %}
                 {% endfor %}
+            {% endif %}
+            {% if viewer.id == report.author.id %}
+                <h3>Give Permission to Groups</h3>
+                <form class="groupreport-form" action="#" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <input type="text" class="form-control group-name" name="group-name" placeholder="Enter Group Name">
+                                    <span class="input-group-btn">
+                                        <button name="report-group-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                </form>
+                <h3>Give Permission to Users</h3>
+                <form class="userreport-form" action="#" method="post">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                    <input type="text" class="form-control group-name" name="user-name" placeholder="Enter User Name">
+                                    <span class="input-group-btn">
+                                        <button name="report-user-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
+                                    </span>
+                                </div><!-- /input-group -->
+                </form>
             {% endif %}
 
         {% endif %}

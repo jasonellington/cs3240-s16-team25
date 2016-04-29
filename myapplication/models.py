@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 
 
@@ -25,6 +25,8 @@ class Report(models.Model):
     content = models.TextField()
     security = models.BooleanField(default=False)
     encrypted = models.BooleanField(default=False)
+    groups = models.ManyToManyField(Group)
+    users = models.ManyToManyField(User, related_name='permittedUsers')
 
     def __str__(self):
         return self.description

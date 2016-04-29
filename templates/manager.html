@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SafeCollab</title>
+    <title>SafeCollab - Manager</title>
     {% load staticfiles %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static "styles.css" %}">
@@ -28,15 +28,10 @@
     <ul class="nav navbar-nav">
       <li><a href="/myapplication">Home</a></li>
       <li class="active"><a href="/myapplication/manager">Manager</a></li>
-      <li><a href="#">Groups</a></li>
+      <li><a href="/myapplication/groups">Groups</a></li>
       <li><a href="/myapplication/messaging">Messages</a></li>
       <li><a href="/myapplication/reports">Reports</a></li>
     </ul>
-      <form role="search" class="navbar-form navbar-right">
-                <div class="form-group">
-                    <input type="text" placeholder="Search" class="form-control">
-                </div>
-            </form>
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account

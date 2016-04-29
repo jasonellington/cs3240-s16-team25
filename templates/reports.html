@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>SafeCollab - Reports</title>
     {% load staticfiles %}
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static "styles.css" %}">
@@ -25,15 +25,10 @@
                         <li><a href="/myapplication/manager">Manager</a></li>
                     {% else %}
                     {%  endif %}
-                <li><a href="#">Groups</a></li>
+                <li><a href="/myapplication/groups">Groups</a></li>
                 <li><a href="/myapplication/messaging">Messages</a></li>
                 <li class="active"><a href="/myapplication/reports">Reports</a></li>
             </ul>
-            <form role="search" class="navbar-form navbar-right">
-                <div class="form-group">
-                    <input type="text" placeholder="Search" class="form-control">
-                </div>
-            </form>
             <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">Account
@@ -93,6 +88,7 @@
                         <th>Name</th>
                         <th>View</th>
                         <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +99,7 @@
                                 {% csrf_token %}
                                 <input hidden type="text" name="folderID" value="{{ folder.id }}">
                                 <button name="view-btn" value="Click" type="submit"
-                                        class="btn btn-danger delete-btn">
+                                        class="btn btn-info">
                                 View
                                 </button>
                             </form>
@@ -116,6 +112,8 @@
                                 Edit
                                 </button>
                             </form>
+                            </td>
+                            <td>
                             <form class="viewfolder-form" action="#" method="post">
                                 {% csrf_token %}
                                 <input hidden type="text" name="folderID" value="{{ folder.id }}">
@@ -181,6 +179,10 @@
                     {% endfor %}
                     </tbody>
                 </table>
+            {% else %}
+                <div class="alert alert-info">
+                    <strong>Info!</strong> No reports have been created.
+                </div>
             {% endif %}
             <br>
         {% else %}
