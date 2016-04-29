@@ -21,7 +21,12 @@ from mysite.settings import MEDIA_URL
 
 def index(request):
     report_list=Report.objects.all()
-    context_dict = {'Reports' : report_list}
+    Mlist = Message.objects.filter(recipient=request.user.username, viewed=False)
+    if len(Mlist) != 0:
+        NewM = True
+    else:
+        NewM= False
+    context_dict = {'Reports' : report_list, 'NewM':NewM}
 
     return render(request, 'index.html', context_dict)
 
@@ -254,6 +259,9 @@ def view_report(request):
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
             viewer = request.user
+            x= r.views
+            r.views= x + 1
+            r.save()
             context_dict = {'report' : r, 'files' : files, 'viewer' : viewer}
             return render(request, 'viewreport.html', context_dict)
         return render(request, 'viewreport.html')
@@ -285,6 +293,16 @@ def edit_folder(request):
         return render(request, 'addtofolder.html', context_dict)
     else:
         return HttpResponse("You should not be here")
+
+def delete_folder(request):
+    if request.POST.get('folderID'):
+        try:
+            ReportFolder.objects.get(id=request.POST.get('folderID')).delete()
+        except: ReportFolder.DoesNotExist
+        return render(request, 'reports.html')
+    else:
+        return HttpResponse("You should not be here")
+
 
 def view_folder(request):
     if request.POST.get('folderID'):
@@ -322,7 +340,11 @@ def messaging(request):
     except:
          Messages = []
     Users = User.objects.all()
+    for m in Messages:
+        m.viewed=True
+        m.save()
     context_dict = {'messages' : Messages, 'users' :Users, 'NError': False, 'SError':False}
+
 
 
 
@@ -424,7 +446,7 @@ def messaging(request):
 
 
 def reports(request):
-    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all())).order_by('views')
     if request.user.is_staff:
         report_list=Report.objects.all()
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)
@@ -598,4 +620,12 @@ def fda_get_report(request):
 def groups(request):
     group_list  =request.user.groups.all()
     context_dict = {'groups': group_list}
+
+    if request.method=='POST':
+        if request.POST.get("NewGroup"):
+            group_form = GroupForm(data=request.POST)
+            if group_form.is_valid():
+                group = group_form.save()
+                group.user_set.add(request.user)
+                group.save()
     return render(request, 'groups.html', context_dict)
