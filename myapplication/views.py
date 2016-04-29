@@ -21,7 +21,12 @@ from mysite.settings import MEDIA_URL
 
 def index(request):
     report_list=Report.objects.all()
-    context_dict = {'Reports' : report_list}
+    Mlist = Message.objects.filter(recipient=request.user.username, viewed=False)
+    if len(Mlist) != 0:
+        NewM = True
+    else:
+        NewM= False
+    context_dict = {'Reports' : report_list, 'NewM':NewM}
 
     return render(request, 'index.html', context_dict)
 
@@ -322,7 +327,11 @@ def messaging(request):
     except:
          Messages = []
     Users = User.objects.all()
+    for m in Messages:
+        m.viewed=True
+        m.save()
     context_dict = {'messages' : Messages, 'users' :Users, 'NError': False, 'SError':False}
+
 
 
 
