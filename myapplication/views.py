@@ -321,7 +321,8 @@ def messaging(request):
         Messages = Message.objects.filter(recipient=request.user.username)
     except:
          Messages = []
-    context_dict = {'messages' : Messages}
+    Users = User.objects.all()
+    context_dict = {'messages' : Messages, 'users' :Users, 'NError': False, 'SError':False}
 
 
 
@@ -333,22 +334,32 @@ def messaging(request):
             if form.is_valid():
                 send_message = form.save(commit=False)
                 send_message.sender = request.user.username
-                if send_message.encrypted:
-                    #print("fetching " + send_message.recipient + "'s public key")
-                    keys = PublicKey.objects.filter(user=send_message.recipient)
-                    if len(keys) ==0:
-                        send_message.encrypted=False
+                if len(User.objects.filter(username=send_message.recipient)) == 0:
+                    context_dict['NError'] =True
+                    print("invalid recipient")
+                    pass
+                else:
+                    if send_message.encrypted:
+                        #print("fetching " + send_message.recipient + "'s public key")
+                        keys = PublicKey.objects.filter(user=send_message.recipient)
+                        if len(keys) ==0:
+                            context_dict['SError']=True
+                            print("Recipient's public key not set")
+                            send_message.encrypted=False
+                        else:
+                            pubkey = keys[0]
+                            #print("constructing key")
+                            public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
+                            #print("encrypting message")
+                            result = public.encrypt(str.encode(send_message.message),32)
+                            send_message.message="this is encrypted"
+                            send_message.bites=result[0]
+                            send_message.save()
+                            #print("message encrypted")
                     else:
-                        pubkey = keys[0]
-                        #print("constructing key")
-                        public = RSA.construct((int(pubkey.Nval),int(pubkey.Eval)))
-                        #print("encrypting message")
-                        result = public.encrypt(str.encode(send_message.message),32)
-                        send_message.message="this is encrypted"
-                        send_message.bites=result[0]
-                        #print("message encrypted")
+                        send_message.save()
 
-                send_message.save()
+
 
             else:
                 print(form.errors)

@@ -51,6 +51,9 @@
 </div>
 
 {% if user.is_authenticated %}
+    {% if NError %}
+        Invalid name
+    {% endif %}
     <div class="container">
         <form id="send_message" method="post" action="/myapplication/messaging/"
               enctype="multipart/form-data">
@@ -71,6 +74,10 @@
             <!-- Provide a button to click to submit the form. -->
             <input class="btn btn-success" type="submit" name="submit" value="Send Message"/>
     </form>
+    {% if SError %}
+        Public Key not set, Message not sent
+    {% endif %}
+
     </div>
 
     <div class="container">
