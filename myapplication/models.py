@@ -13,6 +13,7 @@ class Message(models.Model):
     message = models.TextField()
     encrypted = models.BooleanField(default=False)
     bites = models.BinaryField(null=True)
+    viewed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.recipient
