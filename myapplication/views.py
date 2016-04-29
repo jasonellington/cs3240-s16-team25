@@ -615,4 +615,12 @@ def fda_get_report(request):
 def groups(request):
     group_list  =request.user.groups.all()
     context_dict = {'groups': group_list}
+
+    if request.method=='POST':
+        if request.POST.get("NewGroup"):
+            group_form = GroupForm(data=request.POST)
+            if group_form.is_valid():
+                group = group_form.save()
+                group.user_set.add(request.user)
+                group.save()
     return render(request, 'groups.html', context_dict)
