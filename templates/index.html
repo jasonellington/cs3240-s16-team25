@@ -106,16 +106,7 @@
                 </tbody>
             </table>
             {% endif %}
-            <form id="group_form" method="post" action="/myapplication"
-                  enctype="multipart/form-data">
-                <h3>New Group:</h3>
-                {% csrf_token %}
 
-                <label for="id_username">Name:</label>
-                <input class="form-control" id="id_name" maxlength="30" name="name" type="text"/>
-                <br>
-                <input class="btn btn-default" type="submit" name="submit" value="Submit"/>
-            </form>
 
         {% else %}
             {% if registered %}

@@ -585,7 +585,9 @@ def fda_login(request):
 
 def fda_list_reports(request):
     if request.user.is_authenticated():
-        report_list = Report.objects.all()
+        report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+        if request.user.is_staff:
+            report_list=Report.objects.all()
         reports = {'num': [], 'Description': [], 'Author': [], 'Date': [], 'Encrypted': [], 'Content': [], 'ID': []}
         num = 0
         for report in report_list:
@@ -632,4 +634,12 @@ def fda_get_report(request):
 def groups(request):
     group_list  =request.user.groups.all()
     context_dict = {'groups': group_list}
+
+    if request.method=='POST':
+        if request.POST.get("NewGroup"):
+            group_form = GroupForm(data=request.POST)
+            if group_form.is_valid():
+                group = group_form.save()
+                group.user_set.add(request.user)
+                group.save()
     return render(request, 'groups.html', context_dict)
