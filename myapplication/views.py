@@ -259,6 +259,9 @@ def view_report(request):
             r = Report.objects.get(id=request.POST.get('reportID'))
             files = ReportFile.objects.filter(reporter=r)
             viewer = request.user
+            x= r.views
+            r.views= x + 1
+            r.save()
             context_dict = {'report' : r, 'files' : files, 'viewer' : viewer}
             return render(request, 'viewreport.html', context_dict)
         return render(request, 'viewreport.html')
@@ -443,7 +446,7 @@ def messaging(request):
 
 
 def reports(request):
-    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all()))
+    report_list = Report.objects.filter(Q(security=False) | Q(users=request.user) | Q(groups=request.user.groups.all())).order_by('views')
     if request.user.is_staff:
         report_list=Report.objects.all()
     folder_list = ReportFolder.objects.filter(owner_id=request.user.id)

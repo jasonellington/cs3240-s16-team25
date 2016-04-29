@@ -28,6 +28,7 @@ class Report(models.Model):
     encrypted = models.BooleanField(default=False)
     groups = models.ManyToManyField(Group)
     users = models.ManyToManyField(User, related_name='permittedUsers')
+    views = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.description
@@ -48,3 +49,8 @@ class ReportFolder(models.Model):
     owner = models.ForeignKey(User, null=True)
     name = models.CharField(max_length=50)
     reports = models.ManyToManyField(Report)
+
+class ReportComment(models.Model):
+    reporton = models.ForeignKey(Report)
+    poster = models.ForeignKey(User)
+    comment = models.TextField()
