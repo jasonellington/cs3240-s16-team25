@@ -643,7 +643,8 @@ def fda_get_report(request):
 
 def groups(request):
     group_list  =request.user.groups.all()
-    context_dict = {'groups': group_list}
+    user_list = User.objects.all()
+    group_form = GroupForm()
 
     if request.method=='POST':
         if request.POST.get("NewGroup"):
@@ -652,4 +653,7 @@ def groups(request):
                 group = group_form.save()
                 group.user_set.add(request.user)
                 group.save()
+
+    context_dict = {'groups': group_list, 'users': user_list, 'group_form':group_form}
+
     return render(request, 'groups.html', context_dict)
