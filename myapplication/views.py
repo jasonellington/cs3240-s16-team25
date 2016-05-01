@@ -1,5 +1,6 @@
 import json
 
+from Crypto.Hash import MD5
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
@@ -177,6 +178,8 @@ def user_to_report(request):
     return HttpResponseRedirect('/myapplication/reports')
 
 def new_report(request):
+    h = MD5.new()
+    chunk_size = 8192
     if request.user.is_authenticated():
         if request.method == 'POST':
             if request.POST.get('description'):
@@ -193,7 +196,13 @@ def new_report(request):
                 report.description = request.POST.get('description')
                 report.save()
                 for count, x in enumerate(request.FILES.getlist("files")):
-                    report_file = ReportFile(reporter=report, file=x)
+                    while True:
+                        chunk = x.read(chunk_size)
+                        if len(chunk) == 0:
+                            break
+                        h.update(chunk)
+                    hash = h.hexdigest()
+                    report_file = ReportFile(reporter=report, file=x, hash=hash)
                     report_file.save()
         return render(request, 'makereport.html')
     else:
@@ -622,7 +631,8 @@ def fda_get_report(request):
             for file in files:
                 file_info = {
                     'name': file.file.name,
-                    'url': file.file.url
+                    'url': file.file.url,
+                    'hash': file.hash
                 }
                 f.append(file_info)
             data = {'report' : r, 'files' : f}

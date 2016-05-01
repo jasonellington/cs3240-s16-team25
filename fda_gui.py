@@ -1,5 +1,4 @@
 import json
-from tkinter import simpledialog
 from tkinter.ttk import Treeview
 
 from lxml import html
@@ -10,8 +9,7 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename
 import tkinter.messagebox as tm
 import struct
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA256
-
+from Crypto.Hash import SHA256, MD5
 
 global opener
 opener = urllib.request.build_opener(
@@ -157,6 +155,8 @@ class ReportsPage(Page):
         self.pack()
 
     def load_data(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
         list = json.loads(opener.open(base_url + '/myapplication/fdalistreports/').read().decode("utf-8"))
         global data
         data = list['reports']
@@ -202,13 +202,15 @@ class ViewPage(Page):
         self.file_tree = Treeview(self, height=5)
         self.file_tree.bind("<Double-1>", self.onDoubleClick)
         self.file_tree["show"] = "headings"
-        self.file_tree["columns"] = ("name", "encrypted", "url")
+        self.file_tree["columns"] = ("name", "encrypted", "url", "hash")
         self.file_tree.column("name", width=200 )
         self.file_tree.column("encrypted", width=25)
         self.file_tree.column("url", width=10)
+        self.file_tree.column("hash", width=10)
         self.file_tree.heading("name", text="File Name")
         self.file_tree.heading("encrypted", text="Encrypted")
         self.file_tree.heading("url", text="URL")
+        self.file_tree.heading("hash", text="Hash")
         self.file_tree["displaycolumns"] = ("name", "encrypted")
 
         self.val_desc.grid(row=0, column=2)
@@ -221,9 +223,10 @@ class ViewPage(Page):
         # self.pack()
 
     def load_data(self, data, report_num):
+        for row in self.file_tree.get_children():
+            self.file_tree.delete(row)
         report_response = json.loads(opener.open(base_url + '/myapplication/fdagetreport?reportID=' + str(data['ID'][int(report_num)-1])).read().decode("utf-8"))
         report = report_response['report']
-        print("\n============== REPORT ==============\n")
         self.report_desc.set(report['Description'])
         self.report_author.set(report['Author'])
         self.report_date.set(report['Date'])
@@ -237,8 +240,7 @@ class ViewPage(Page):
             i = 0
             for file in report_response['files']:
                 i+=1
-                self.file_tree.insert("", i-1, str(i), values=(file['name'][2:], report['Encrypted'], file['url']))
-                print("\t" + str(i) + ": " + file['name'][2:])
+                self.file_tree.insert("", i-1, str(i), values=(file['name'][2:], report['Encrypted'], file['url'], file['hash']))
         else:
             pass
 
@@ -246,22 +248,35 @@ class ViewPage(Page):
         item = self.file_tree.selection()[0]
         file_name = self.file_tree.item(item, "values")[0]
         file_url = self.file_tree.item(item, "values")[2]
+        file_hash = self.file_tree.item(item, "values")[3]
         extensions = file_name.split(".")
-        print(extensions)
         if not self.encrypted:
+            h = MD5.new()
+            chunk_size = 8192
             ext = '.' + extensions[len(extensions)-1]
             f = asksaveasfilename(title="Save File", defaultextension=ext, filetypes=[('Original File Type', ext)], initialfile=file_name)
             with open(f, 'wb') as out_file:
-                download = opener.open(base_url + file_url).read()
+                download = opener.open(base_url + file_url)
+                while True:
+                    chunk = download.read(chunk_size)
+                    if len(chunk) == 0:
+                        break
+                    h.update(chunk)
+                download_hash = h.hexdigest()
+                download = download.read()
                 out_file.write(download)
-                tm.showinfo("Success", "File successfully downloaded!")
+                print(download_hash)
+                if file_hash == download_hash:
+                    tm.showinfo("Success", "File successfully downloaded!")
+                else:
+                    tm.showwarning("Error", "File downloaded, but MD5 checksum doesn't match, file may be damaged")
                 reports_frame.lift()
                 reports_frame.load_data()
         else:
             ext = '.' + extensions[len(extensions)-2]
             f = asksaveasfilename(title="Save File", defaultextension=ext, filetypes=[('Original File Type', ext)], initialfile=file_name.replace(".enc", ""))
             decrypt_frame.lift()
-            decrypt_frame.decrypt(f, base_url + file_url)
+            decrypt_frame.decrypt(f, base_url + file_url, file_hash)
 
 
 class DecryptPage(Page):
@@ -269,6 +284,7 @@ class DecryptPage(Page):
         Page.__init__(self, *args, **kwargs)
         self.f = ""
         self.url = ""
+        self.file_hash = ""
         self.label_pass = Label(self, text="Enter password for decryption:")
         self.entry_pass = Entry(self, show="*")
         self.label_pass.grid(row=1, sticky=E)
@@ -277,15 +293,23 @@ class DecryptPage(Page):
         self.decrypt_btn.grid(columnspan=2)
         self.pack()
 
-    def decrypt(self, f, url):
+    def decrypt(self, f, url, file_hash):
         self.f = f
         self.url = url
-
+        self.file_hash = file_hash
 
     def _decrypt_btn_clicked(self):
+        h = MD5.new()
+        chunk_size = 8192
         chunksize = 16 * 1024
         with open(self.f, 'wb') as out_file:
             download = opener.open(self.url)
+            while True:
+                chunk = download.read(chunk_size)
+                if len(chunk) == 0:
+                    break
+                h.update(chunk)
+            download_hash = h.hexdigest()
             password = self.entry_pass.get()
             key = SHA256.new(password.encode('utf-8')).hexdigest()[:16]
             origsize = struct.unpack('<Q', download.read(struct.calcsize('Q')))[0]
@@ -296,7 +320,10 @@ class DecryptPage(Page):
                 if len(chunk) == 0:
                     break
                 out_file.write(decryptor.decrypt(chunk))
-            tm.showinfo("Success", "File successfully downloaded!")
+            if self.file_hash == download_hash:
+                tm.showinfo("Success", "File successfully downloaded!")
+            else:
+                tm.showwarning("Error", "File downloaded, but MD5 checksum doesn't match, file may be damaged")
             reports_frame.lift()
             reports_frame.load_data()
 

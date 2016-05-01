@@ -43,7 +43,10 @@ class PublicKey(models.Model):
 class ReportFile(models.Model):
     reporter = models.ForeignKey(Report)
     file = models.FileField()
+    hash = models.CharField(max_length=40, default=None, null=True)
 
+    def __str__(self):
+        return self.file.name
 
 
 class ReportFolder(models.Model):
