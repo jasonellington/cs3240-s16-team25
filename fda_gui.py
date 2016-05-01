@@ -1,7 +1,6 @@
 import json
 from tkinter.ttk import Treeview
 
-from lxml import html
 import os
 import urllib.request
 from tkinter import *
@@ -10,6 +9,7 @@ import tkinter.messagebox as tm
 import struct
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256, MD5
+from lxml import html
 
 global opener
 opener = urllib.request.build_opener(
@@ -263,9 +263,8 @@ class ViewPage(Page):
                         break
                     h.update(chunk)
                 download_hash = h.hexdigest()
-                download = download.read()
+                download = opener.open(base_url + file_url).read()
                 out_file.write(download)
-                print(download_hash)
                 if file_hash == download_hash:
                     tm.showinfo("Success", "File successfully downloaded!")
                 else:
@@ -310,6 +309,7 @@ class DecryptPage(Page):
                     break
                 h.update(chunk)
             download_hash = h.hexdigest()
+            download = opener.open(self.url)
             password = self.entry_pass.get()
             key = SHA256.new(password.encode('utf-8')).hexdigest()[:16]
             origsize = struct.unpack('<Q', download.read(struct.calcsize('Q')))[0]
