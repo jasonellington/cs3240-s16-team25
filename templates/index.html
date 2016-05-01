@@ -58,54 +58,10 @@
             {% else %}
             <p>You are logged in as {{ user.username }}!</p>
             {% endif %}
-             <h3>Reports</h3>
-            {% if Reports %}
-                 <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Owner</th>
-                    <th>Date</th>
-                    <th>Content</th>
-                    <th>Private</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for report in Reports %}
-                    <tr>
-                        <td>{{ report.description }}</td>
-                        <td>{{ report.author }}</td>
-                        <td>{{ report.date }}</td>
-                        <td>{{ report.content }}</td>
-                        <td>{{ report.security }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-                </table>
-            {% endif %}
 
-            <!-- Trying to add Groups to homepage-->
-            {% if groups %}
-            <h3>Groups: </h3>
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th>Existing Groups</th>
-                    <th>Group Members</th>
-                    <th>Group Reports</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for group in groups %}
-                    <tr>
-                        <td>{{ group.name }}</td>
-                        <td><a class="btn btn-primary" href="#" role="button">Members</a></td>
-                       <td><a class="btn btn-primary" href="#" role="button">Reports</a></td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
+
+
+
 
 
         {% else %}
