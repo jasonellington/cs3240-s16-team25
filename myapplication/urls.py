@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from myapplication import views
+from django.contrib.auth import views as v
 
 urlpatterns = patterns('',
         url(r'^$', views.index, name='index'),
@@ -24,5 +25,6 @@ urlpatterns = patterns('',
         url(r'^userreport/$', views.user_to_report, name='usertoreport'),
         url(r'^deletefolder/$', views.delete_folder, name='deletefolder'),
         url(r'^groupreport/$', views.group_to_report, name='grouptoreport'),
-        url(r'^groups/$', views.groups, name='groups')
+        url(r'^groups/$', views.groups, name='groups'),
+
                        )
