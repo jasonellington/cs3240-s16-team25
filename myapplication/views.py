@@ -211,6 +211,7 @@ def new_report(request):
 
 
 def edit_report(request):
+    chunk_size = 8192
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
             r = Report.objects.get(id=request.POST.get('reportID'))
@@ -232,11 +233,12 @@ def edit_report(request):
                 for count, x in enumerate(request.FILES.getlist("files")):
                     if x.size > 3145728:
                         continue
-                    report_file = ReportFile(reporter=rep, file=x)
+                    while True:
+                        chunk = x.read(chunk_size)
+                        if len(chunk) == 0:
+                            break
+                    report_file = ReportFile(reporter=rep, file=x, hash=hash)
                     report_file.save()
-                    with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
-                        for chunk in x.chunks():
-                            destination.write(chunk)
             return render(request, 'editreport.html')
 
     else:
@@ -652,7 +654,8 @@ def fda_get_report(request):
 
 def groups(request):
     group_list  =request.user.groups.all()
-    context_dict = {'groups': group_list}
+    user_list = User.objects.all()
+    group_form = GroupForm()
 
     if request.method=='POST':
         if request.POST.get("NewGroup"):
@@ -661,4 +664,7 @@ def groups(request):
                 group = group_form.save()
                 group.user_set.add(request.user)
                 group.save()
+
+    context_dict = {'groups': group_list, 'users': user_list, 'group_form':group_form}
+
     return render(request, 'groups.html', context_dict)
