@@ -21,13 +21,12 @@ from mysite.settings import MEDIA_URL
 
 
 def index(request):
-    report_list=Report.objects.all()
     Mlist = Message.objects.filter(recipient=request.user.username, viewed=False)
     if len(Mlist) != 0:
         NewM = True
     else:
         NewM= False
-    context_dict = {'Reports' : report_list, 'NewM':NewM}
+    context_dict = { 'NewM':NewM}
 
     return render(request, 'index.html', context_dict)
 
@@ -308,11 +307,17 @@ def new_folder(request):
 
 def edit_folder(request):
     if request.POST.get('folderID'):
+        folder = ReportFolder.objects.get(id=request.POST.get('folderID'))
+        if request.POST.get('reportID'):
+            folder.reports.add(Report.objects.get(id=request.POST.get('reportID')))
+        if request.POST.get('rename'):
+            rename = request.POST.get('rename')
+            f = ReportFolder.objects.get(id=request.POST.get('folderID'))
+            f.name=rename
+            f.save()
         userreports = Report.objects.filter(author_id=request.user.id)
         folder = ReportFolder.objects.get(id=request.POST.get('folderID'))
         context_dict = {'reports' : userreports, 'folder' : folder}
-        if request.POST.get('reportID'):
-            folder.reports.add(Report.objects.get(id=request.POST.get('reportID')))
         return render(request, 'addtofolder.html', context_dict)
     else:
         return HttpResponse("You should not be here")

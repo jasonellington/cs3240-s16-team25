@@ -21,8 +21,11 @@
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="/myapplication">Home</a></li>
-                <li><a href="/myapplication/manager">Manager</a></li>
-                <li><a href="#">Groups</a></li>
+                {% if user.is_staff %}
+                        <li><a href="/myapplication/manager">Manager</a></li>
+                    {% else %}
+                    {%  endif %}
+                <li><a href="/myapplication/groups">Groups</a></li>
                 <li><a href="/myapplication/messaging">Messages</a></li>
                 <li class="active"><a href="/myapplication/reports">Reports</a></li>
             </ul>
