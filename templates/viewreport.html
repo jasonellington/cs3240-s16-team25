@@ -48,19 +48,25 @@
             <br>
             <p>{{ report.content }}</p>
             {% if files %}
-                {% for f in files %}
-                    <a href="{{ MEDIA_URL }}{{ f.file.name }}">{{ f.file.name }}</a>
-                    {% if report.author.username == user.username %}
-                         <form class="deletefile-form" action="#" method="post">
-                                    {% csrf_token %}
-                                    <input hidden type="text" name="fileID" value="{{ f.id }}">
-                                    <input hidden type="text" name="reportID" value="{{ report.id }}">
-                                    <button name="deletefile-btn" value="Click" type="submit">
-                                    X
-                                    </button>
-                                </form>
-                    {% endif %}
-                {% endfor %}
+                {% if report.encrypted %}
+                    <h4>Please use the File Download Application to encrypt files or download encrypted files:</h4>
+                    <a href="{% static "fda_linux" %}">FDA For Linux</a><br>
+                    <a href="{% static "fda_windows.exe" %}">FDA For Windows</a><br><br>
+                {% else %}
+                    {% for f in files %}
+                        <a href="{{ MEDIA_URL }}{{ f.file.name }}">{{ f.file.name }}</a>
+                        {% if report.author.username == user.username %}
+                             <form class="deletefile-form" action="#" method="post">
+                                        {% csrf_token %}
+                                        <input hidden type="text" name="fileID" value="{{ f.id }}">
+                                        <input hidden type="text" name="reportID" value="{{ report.id }}">
+                                        <button name="deletefile-btn" value="Click" type="submit">
+                                        X
+                                        </button>
+                                    </form>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             {% endif %}
             <br><br><br><br>
             <h3>Comments</h3>
