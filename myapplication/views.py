@@ -108,15 +108,6 @@ def settings(request):
             else:
                 un = UserNumber(user=request.user, phone_number=number)
                 un.save()
-            data = {
-                "to": number,
-                "body": "You have a new message on SafeCollab!"
-            }
-            headers = {
-                'Content-Type': 'application/json',
-            }
-            url = os.environ.get("EASYSMS_URL") + '/messages'
-            print(requests.post(url, headers=headers, data=data))
 
     else:
         un = UserNumber.objects.filter(user=request.user)
@@ -425,6 +416,8 @@ def messaging(request):
                     print("invalid recipient")
                     pass
                 else:
+                    recipient = User.objects.get(username=send_message.recipient)
+                    un = UserNumber.objects.filter(user=recipient)
                     if send_message.encrypted:
                         #print("fetching " + send_message.recipient + "'s public key")
                         keys = PublicKey.objects.filter(user=send_message.recipient)
@@ -441,9 +434,26 @@ def messaging(request):
                             send_message.message="this is encrypted"
                             send_message.bites=result[0]
                             send_message.save()
+                            if len(un) > 0:
+                                number = un[0].get_number()
+                                data = '{"to": "' + number + '","body": "You have a new message on SafeCollab!"}'
+                                headers = {
+                                    'Content-Type': 'application/json',
+                                }
+                                url = os.environ.get("EASYSMS_URL") + '/messages'
+                                requests.post(url, headers=headers, data=data)
+
                             #print("message encrypted")
                     else:
                         send_message.save()
+                        if len(un) > 0:
+                            number = un[0].get_number()
+                            data = '{"to": "' + number + '","body": "You have a new message on SafeCollab!"}'
+                            headers = {
+                                'Content-Type': 'application/json',
+                            }
+                            url = os.environ.get("EASYSMS_URL") + '/messages'
+                            requests.post(url, headers=headers, data=data)
 
 
 
