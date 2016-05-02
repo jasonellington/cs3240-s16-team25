@@ -58,3 +58,14 @@ class ReportComment(models.Model):
     reporton = models.ForeignKey(Report)
     poster = models.ForeignKey(User)
     comment = models.TextField()
+
+
+class UserNumber(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    phone_number = models.CharField(max_length=11, null=True, default=None)
+
+    def get_number(self):
+        return self.phone_number
+
+    def set_number(self, number):
+        self.phone_number = number

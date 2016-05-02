@@ -8,7 +8,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadReque
 from django.template import RequestContext
 from django.core import serializers
 
-from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder, ReportComment
+from myapplication.models import Message, Report, PublicKey, ReportFile, ReportFolder, ReportComment, UserNumber
 from django.contrib.auth.models import User, Group
 from myapplication.forms import UserForm, GroupForm, SendMessage, ReportForm, ReportFolderForm
 from Crypto.PublicKey import RSA
@@ -86,14 +86,32 @@ def user_logout(request):
     return HttpResponseRedirect('/myapplication/')
 
 def settings(request):
+    context_dict = {'number': ""}
     if request.method == 'POST':
-        if request.POST['change_password']:
+        if request.POST.get('change_password'):
             new_pass = request.POST['change_password']
             u = request.user
             u.set_password(new_pass)
             u.save()
             return HttpResponseRedirect('/myapplication/')
-    return render(request, 'settings.html')
+        if request.POST.get('phone_number'):
+            number = request.POST['phone_number']
+            context_dict['number'] = number
+            un_list = UserNumber.objects.filter(user=request.user)
+            if len(un_list) > 0:
+                un = un_list[0]
+                un.set_number(number)
+                un.save()
+            else:
+                un = UserNumber(user=request.user, phone_number=number)
+                un.save()
+
+    else:
+        un = UserNumber.objects.filter(user=request.user)
+        if len(un) > 0:
+            context_dict['number'] = un[0].get_number()
+
+    return render(request, 'settings.html', context_dict)
 
 
 def manager(request):

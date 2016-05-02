@@ -80,6 +80,15 @@
             <!-- Provide a button to click to submit the form. -->
             <input class="btn btn-default" type="submit" name="SetKey" value="Set Key"/>
     </form>
+
+    <form id="number_form" method="post" action="/myapplication/settings/">
+    <h3>Input Phone Number For SMS Alerts For Messages:</h3>
+        {% csrf_token %}
+        <label for="id_phone_number">Phone Number:</label>
+        <input type="input" class="form-control" id="id_phone_number" name="phone_number" value={{ number }} >
+        <!-- Provide a button to click to submit the form. -->
+        <br><input class="btn btn-default" type="submit" name="submit" value="Save"/>
+    </form>
 </div>
 
 <script type="text/javascript">
