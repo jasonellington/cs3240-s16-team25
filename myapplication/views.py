@@ -113,7 +113,7 @@ def settings(request):
             }
             print("SMS: " + os.environ.get("EASYSMS_URL"))
             http = urllib3.PoolManager()
-            r = http.request("POST", os.environ.get("EASYSMS_URL") + "/messages", body=json.dumps(values))
+            r = http.request("POST", os.environ.get("EASYSMS_URL") + "/messages", body=json.dumps(values), headers={'Content-Type': 'application/json'})
             print(r.status)
             print(r.data)
 
