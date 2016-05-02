@@ -135,7 +135,7 @@ def manager(request):
 
     else:
         #Deploy SWAT if a non-admin tries to access the page
-        return HttpResponse("A SWAT team is on the way")
+        return HttpResponseRedirect('/myapplication')
 
 def user_to_group(request):
     if request.method == 'POST':
@@ -656,12 +656,12 @@ def groups(request):
     group_form = GroupForm()
 
     if request.method=='POST':
-        if request.POST.get("NewGroup"):
-            group_form = GroupForm(data=request.POST)
-            if group_form.is_valid():
-                group = group_form.save()
-                group.user_set.add(request.user)
-                group.save()
+        group_form = GroupForm(data=request.POST)
+        user = request.POST.get('name')
+        if group_form.is_valid():
+            group = group_form.save()
+            group.user_set.add(user)
+            group.save()
 
     context_dict = {'groups': group_list, 'users': user_list, 'group_form':group_form}
 
