@@ -211,6 +211,7 @@ def new_report(request):
 
 
 def edit_report(request):
+    chunk_size = 8192
     if request.user.is_authenticated():
         if request.POST.get('reportID'):
             r = Report.objects.get(id=request.POST.get('reportID'))
@@ -232,11 +233,12 @@ def edit_report(request):
                 for count, x in enumerate(request.FILES.getlist("files")):
                     if x.size > 3145728:
                         continue
-                    report_file = ReportFile(reporter=rep, file=x)
+                    while True:
+                        chunk = x.read(chunk_size)
+                        if len(chunk) == 0:
+                            break
+                    report_file = ReportFile(reporter=rep, file=x, hash=hash)
                     report_file.save()
-                    with open(settings.MEDIA_ROOT + x.name, 'wb+') as destination:
-                        for chunk in x.chunks():
-                            destination.write(chunk)
             return render(request, 'editreport.html')
 
     else:
