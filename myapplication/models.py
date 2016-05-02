@@ -62,7 +62,7 @@ class ReportComment(models.Model):
 
 class UserNumber(models.Model):
     user = models.ForeignKey(User, unique=True)
-    phone_number = models.CharField(max_length=11, null=True, default=None)
+    phone_number = models.CharField(max_length=13, null=True, default=None)
 
     def get_number(self):
         return self.phone_number
