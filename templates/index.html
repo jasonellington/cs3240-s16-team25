@@ -49,7 +49,6 @@
   </div>
 </nav>
 </div>
-<div class="cotainer">
     <div class="container">
         {% if user.is_authenticated %}
             <h1>Home Page</h1>
@@ -59,18 +58,13 @@
             <p>You are logged in as {{ user.username }}!</p>
             {% endif %}
 
-
-
-
-
-
         {% else %}
             {% if registered %}
             <strong>Thank you for registering!</strong>
             <a href="/myapplication/">Return to the homepage.</a><br/>
             {% else %}
                 <form id="user_form" method="post" action="/myapplication/register/" enctype="multipart/form-data">
-                    <h1>Register:</h1>
+                    <h2>Register:</h2><br>
                     {% csrf_token %}
 
                     <label for="id_username">Username:</label>
@@ -84,10 +78,10 @@
                     <br>
                     <!-- Provide a button to click to submit the form. -->
                     <input class="btn btn-default" type="submit" name="submit" value="Register"/>
+                    <a href="/user/password/reset/" class="btn btn-default">Lost Password</a>
                 </form>
             {% endif %}
         {% endif %}
-    </div>
 </div>
 </body>
 </html>
