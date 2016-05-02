@@ -1,6 +1,7 @@
 import json
 import os
 import urllib3
+import requests
 
 from Crypto.Hash import MD5
 from django.contrib.auth import authenticate, logout, login
@@ -107,15 +108,15 @@ def settings(request):
             else:
                 un = UserNumber(user=request.user, phone_number=number)
                 un.save()
-            values = {
+            data = {
                 "to": number,
                 "body": "You have a new message on SafeCollab!"
             }
-            print("SMS: " + os.environ.get("EASYSMS_URL"))
-            http = urllib3.PoolManager()
-            r = http.request("POST", os.environ.get("EASYSMS_URL") + "/messages", body=json.dumps(values), headers={'Content-Type': 'application/json'})
-            print(r.status)
-            print(r.data)
+            headers = {
+                'Content-Type': 'application/json',
+            }
+            url = os.environ.get("EASYSMS_URL") + '/messages'
+            print(requests.post(url, headers=headers, data=data))
 
     else:
         un = UserNumber.objects.filter(user=request.user)
