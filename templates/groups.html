@@ -99,13 +99,15 @@
                         <tr>
                             <td>{{ user.username }}</td>
                             <td>
-                                <form id="group_form" method="post" action="/myapplication/groups/" enctype="multipart/form-data">
-                                {% csrf_token %}
-
-                                <label for="id_username">Name:</label>
-                                <input class="form-control" id="id_name" maxlength="30" name="name" type="text"/>
-                                <br>
-                                <input class="btn btn-default" type="submit" name="NewGroup" value="Submit"/>
+                                <form class="group-form" action="/myapplication/usergroup/" method="post">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <input hidden type="text" name="username" value="{{ user.username }}">
+                                        <input type="text" class="form-control group-name" name="group-name" placeholder="Enter Group Name">
+                                        <span class="input-group-btn">
+                                            <button name="user-group-btn" value="Click" class="user-group-btn btn btn-default" type="submit">Add</button>
+                                        </span>
+                                    </div><!-- /input-group -->
                                 </form>
                             </td>
                         </tr>
