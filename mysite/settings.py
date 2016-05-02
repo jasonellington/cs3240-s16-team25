@@ -74,6 +74,7 @@ if os.environ.get('SENDGRID_USERNAME'):
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
     EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
+    DEFAULT_FROM_EMAIL = 'SafeCollab <noreply@safecollab.com>'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
