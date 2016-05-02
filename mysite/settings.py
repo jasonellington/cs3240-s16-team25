@@ -76,6 +76,7 @@ if os.environ.get('SENDGRID_USERNAME'):
     EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
     DEFAULT_FROM_EMAIL = 'SafeCollab <noreply@safecollab.com>'
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

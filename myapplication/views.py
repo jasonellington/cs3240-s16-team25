@@ -1,4 +1,7 @@
 import json
+import os
+import urllib.parse
+import urllib.request
 
 from Crypto.Hash import MD5
 from django.contrib.auth import authenticate, logout, login
@@ -105,6 +108,17 @@ def settings(request):
             else:
                 un = UserNumber(user=request.user, phone_number=number)
                 un.save()
+            values = {
+                "to": number,
+                "body": "You have a new message on SafeCollab!"
+            }
+            opener = urllib.request.build_opener(
+                urllib.request.HTTPCookieProcessor,
+            )
+            data = urllib.parse.urlencode(values)
+            data = data.encode('utf-8')
+            resp = opener.open(os.environ.get('EASYSMS_URL') + "/messages", data)
+            print(resp)
 
     else:
         un = UserNumber.objects.filter(user=request.user)
