@@ -111,10 +111,11 @@ def settings(request):
                 "to": number,
                 "body": "You have a new message on SafeCollab!"
             }
-
+            print("SMS: " + os.environ.get("EASYSMS_URL"))
             http = urllib3.PoolManager()
             r = http.request("POST", os.environ.get("EASYSMS_URL") + "/messages", body=json.dumps(values))
-            print(r)
+            print(r.status)
+            print(r.data)
 
     else:
         un = UserNumber.objects.filter(user=request.user)
